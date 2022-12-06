@@ -391,6 +391,7 @@ AC_DEFUN([_BITCOIN_QT_CHECK_STATIC_LIBS], [
   PKG_CHECK_MODULES([QT_THEME], [${qt_lib_prefix}ThemeSupport${qt_lib_suffix}], [QT_LIBS="$QT_THEME_LIBS $QT_LIBS"])
   dnl Gridcoin uses Concurrent:
   PKG_CHECK_MODULES([QT_CONCURRENT], [${qt_lib_prefix}Concurrent${qt_lib_suffix}], [QT_LIBS="$QT_CONCURRENT_LIBS $QT_LIBS"])
+  PKG_CHECK_MODULES([QT_QML], [${qt_lib_prefix}Qml${qt_lib_suffix}], [QT_LIBS="$QT_QML_LIBS $QT_LIBS"])
   dnl Gridcoin uses SVG:
   PKG_CHECK_MODULES([QT_SVG], [${qt_lib_prefix}Svg${qt_lib_suffix}], [QT_LIBS="$QT_SVG_LIBS $QT_LIBS"])
   if test "$TARGET_OS" = "linux"; then
@@ -438,6 +439,10 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS],[
   BITCOIN_QT_CHECK([
     PKG_CHECK_MODULES([QT_CONCURRENT], [${qt_lib_prefix}Concurrent${qt_lib_suffix} $qt_version], [QT_INCLUDES="$QT_CONCURRENT_CFLAGS $QT_INCLUDES" QT_LIBS="$QT_CONCURRENT_LIBS $QT_LIBS"],
                       [BITCOIN_QT_FAIL([${qt_lib_prefix}Concurrent${qt_lib_suffix} $qt_version not found])])
+  ])
+  BITCOIN_QT_CHECK([
+    PKG_CHECK_MODULES([QT_QML], [${qt_lib_prefix}Qml${qt_lib_suffix} $qt_version], [QT_INCLUDES="$QT_QML_CFLAGS $QT_INCLUDES" QT_LIBS="$QT_QML_LIBS $QT_LIBS"],
+                      [BITCOIN_QT_FAIL([${qt_lib_prefix}Qml${qt_lib_suffix} $qt_version not found])])
   ])
 
   BITCOIN_QT_CHECK([
