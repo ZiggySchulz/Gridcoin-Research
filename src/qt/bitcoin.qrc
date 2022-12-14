@@ -193,5 +193,10 @@
         <file alias="light">res/stylesheets/light_stylesheet.qss</file>
         <file alias="dark">res/stylesheets/dark_stylesheet.qss</file>
     </qresource>
+    <qresource prefix="/modules/MMPTheme">
+        <file alias="qmldir">res/modules/MMPTheme/qmldir</file>
+        <file alias="MMPTheme.qml">res/modules/MMPTheme/MMPTheme.qml</file>
+        <file alias="MMPTheme.qmltypes">res/modules/MMPTheme/MMPTheme.qmltypes</file>
+    </qresource>
     <qresource prefix="/"/>
 </RCC>
