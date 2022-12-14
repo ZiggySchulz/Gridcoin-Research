@@ -1,0 +1,3 @@
+module MMPTheme
+singleton MMPTheme 1.0 MMPTheme.qml
+typeinfo MMPTheme.qmltypes
