@@ -198,7 +198,7 @@ Rectangle {
         Button {
             id: refreshButton
             text: "Refresh"
-            icon.source: MMPTheme.isLightTheme ? "/resources/icons/buttons/ic_btn_refresh_light.svg" : "/resources/icons/buttons/ic_btn_refresh_dark.svg"
+            icon.source: MMPTheme.isLightTheme ? "qrc:/res/icons/buttons/ic_btn_refresh_light.svg" : "qrc:/res/icons/buttons/ic_btn_refresh_dark.svg"
             anchors {
                 right: parent.right
                 rightMargin: 10
@@ -208,7 +208,7 @@ Rectangle {
         Button {
             id: createPollButton
             text: "Create Poll"
-            icon.source: MMPTheme.isLightTheme ? "/resources/icons/buttons/ic_btn_create_light.svg" : "/resources/icons/buttons/ic_btn_create_dark.svg"
+            icon.source: MMPTheme.isLightTheme ? "qrc:/res/icons/buttons/ic_btn_create_light.svg" : "qrc:/res/icons/buttons/ic_btn_create_dark.svg"
             anchors {
                 right: refreshButton.left
                 rightMargin: 10
@@ -481,7 +481,7 @@ Rectangle {
                 Button {
                     id: detailsButton
                     text: qsTr("Details")
-                    icon.source: MMPTheme.isLightTheme ? "resources/icons/buttons/ic_btn_details_light.svg" : "resources/icons/buttons/ic_btn_details_dark.svg"
+                    icon.source: MMPTheme.isLightTheme ? "qrc:/res/icons/buttons/ic_btn_details_light.svg" : "qrc:/res/icons/buttons/ic_btn_details_dark.svg"
                     onPressed: {
                         var component = Qt.createComponent("PollDetailsWindow.qml")
                         var windowObj = component.createObject(window)
@@ -499,7 +499,7 @@ Rectangle {
                 Button {
                     id: voteButton
                     text: qsTr("Vote")
-                    icon.source: MMPTheme.isLightTheme ? "resources/icons/buttons/ic_btn_vote_light.svg" : "resources/icons/buttons/ic_btn_vote_dark.svg"
+                    icon.source: MMPTheme.isLightTheme ? "qrc:/res/icons/buttons/ic_btn_vote_light.svg" : "qrc:/res/icons/buttons/ic_btn_vote_dark.svg"
                     visible: Time.currentTime < new Date(model.expires*1000)
                     onPressed: {
                         var component = Qt.createComponent("PollVoteWindow.qml")

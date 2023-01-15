@@ -63,7 +63,7 @@ Window {
         Item {
             Image {
                 id: logoImage
-                source: "qrc:/resources/icons/logos/ic_logo_app_gradient_white.svg"
+                source: "qrc:/res/icons/logos/ic_logo_app_gradient_white.svg"
                 sourceSize: Qt.size(120, 120)
                 anchors {
                     top: parent.top
@@ -146,7 +146,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
         Item {
             Image {
                 id: logoImage
-                source: "qrc:/resources/icons/logos/ic_logo_app_gradient_white.svg"
+                source: "qrc:/res/icons/logos/ic_logo_app_gradient_white.svg"
                 sourceSize: Qt.size(120, 120)
                 Layout.alignment: Qt.AlignHCenter
                 anchors {
@@ -199,7 +199,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                                 id: soloImage
                                 anchors.centerIn: parent
                                 sourceSize: Qt.size(80, 80)
-                                source: soloRadioButton.checked ? "qrc:/resources/icons/onboarding/iс_solo_active.svg" : "qrc:/resources/icons/onboarding/iс_solo_inactive.svg"
+                                source: soloRadioButton.checked ? "qrc:/res/icons/onboarding/iс_solo_active.svg" : "qrc:/res/icons/onboarding/iс_solo_inactive.svg"
                             }
                         }
                     }
@@ -240,7 +240,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                                 id: poolImage
                                 anchors.centerIn: parent
                                 sourceSize: Qt.size(80, 80)
-                                source: poolRadioButton.checked ? "qrc:/resources/icons/onboarding/iс_pool_active.svg" : "qrc:/resources/icons/onboarding/iс_pool_inactive.svg"
+                                source: poolRadioButton.checked ? "qrc:/res/icons/onboarding/iс_pool_active.svg" : "qrc:/res/icons/onboarding/iс_pool_inactive.svg"
                             }
                         }
                     }
@@ -281,7 +281,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                                 id: stakerImage
                                 anchors.centerIn: parent
                                 sourceSize: Qt.size(80, 80)
-                                source: stakerRadioButton.checked ? "qrc:/resources/icons/onboarding/ic_investor_active.svg" : "qrc:/resources/icons/onboarding/ic_investor_inactive.svg"
+                                source: stakerRadioButton.checked ? "qrc:/res/icons/onboarding/ic_investor_active.svg" : "qrc:/res/icons/onboarding/ic_investor_inactive.svg"
                             }
                         }
                     }
@@ -352,7 +352,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
         Item {
             Image {
                 id: boincMissingImage
-                source: "qrc:/resources/icons/onboarding/img_onboarding_noboinc.svg"
+                source: "qrc:/res/icons/onboarding/img_onboarding_noboinc.svg"
                 sourceSize: Qt.size(160, 160)
                 anchors {
                     top: parent.top
@@ -401,7 +401,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                     }
                     contentItem: Image {
                         sourceSize: Qt.size(width, height)
-                        source: "qrc:/resources/icons/onboarding/ic_onboarding_btn_more.svg"
+                        source: "qrc:/res/icons/onboarding/ic_onboarding_btn_more.svg"
                         anchors.centerIn: parent
                     }
                 }
@@ -539,7 +539,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
         Item {
             Image {
                 id: boincImage
-                source: "qrc:/resources/icons/onboarding/img_onboarding_boinc.svg"
+                source: "qrc:/res/icons/onboarding/img_onboarding_boinc.svg"
                 sourceSize: Qt.size(160, 160)
                 anchors {
                     top: parent.top
@@ -628,7 +628,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
         Item {
             Image {
                 id: boincImage
-                source: "qrc:/resources/icons/onboarding/img_onboarding_boinc.svg"
+                source: "qrc:/res/icons/onboarding/img_onboarding_boinc.svg"
                 sourceSize: Qt.size(160, 160)
                 anchors {
                     top: parent.top
@@ -697,7 +697,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
         Item {
             Image {
                 id: plotImage
-                source: "qrc:/resources/icons/onboarding/img_onboarding_investor.svg"
+                source: "qrc:/res/icons/onboarding/img_onboarding_investor.svg"
                 sourceSize: Qt.size(160, 160)
                 anchors {
                     top: parent.top
@@ -947,7 +947,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
             }
             Image {
                 id: timeRemainingIcon
-                source: "qrc:/resources/icons/onboarding/ic_onboarding_time.svg"
+                source: "qrc:/res/icons/onboarding/ic_onboarding_time.svg"
                 sourceSize: Qt.size(14, 14)
                 anchors {
                     right: timeRemainingText.left
@@ -962,7 +962,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
         Item {
             Image {
                 id: backgroundStarsImage
-                source: "qrc:/resources/icons/onboarding/bg_onboarding_stars.svg"
+                source: "qrc:/res/icons/onboarding/bg_onboarding_stars.svg"
                 sourceSize: Qt.size(width, height)
                 anchors.fill: parent
                 Text {
@@ -992,7 +992,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                 }
                 Image {
                     id: astronautImage
-                    source: "qrc:/resources/icons/onboarding/img_onboarding_congrats_solo.svg"
+                    source: "qrc:/res/icons/onboarding/img_onboarding_congrats_solo.svg"
                     sourceSize: Qt.size(1.2 * 248, 1.2 * 202)   // (248, 202) is base aspect ratio
                     anchors {
                         horizontalCenter: parent.horizontalCenter
@@ -1018,7 +1018,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
         Item {
             Image {
                 id: backgroundStarsImage
-                source: "qrc:/resources/icons/onboarding/bg_onboarding_stars.svg"
+                source: "qrc:/res/icons/onboarding/bg_onboarding_stars.svg"
                 sourceSize: Qt.size(width, height)
                 anchors.fill: parent
                 Text {
@@ -1048,7 +1048,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                 }
                 Image {
                     id: planetImage
-                    source: "qrc:/resources/icons/onboarding/img_onboarding_congrats_pool.svg"
+                    source: "qrc:/res/icons/onboarding/img_onboarding_congrats_pool.svg"
                     sourceSize: Qt.size(320, 320)   // (320, 320) is base aspect ratio
                     anchors {
                         horizontalCenter: parent.horizontalCenter
@@ -1074,7 +1074,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
         Item {
             Image {
                 id: backgroundStarsImage
-                source: "qrc:/resources/icons/onboarding/bg_onboarding_stars.svg"
+                source: "qrc:/res/icons/onboarding/bg_onboarding_stars.svg"
                 sourceSize: Qt.size(width, height)
                 anchors.fill: parent
                 Text {
@@ -1105,7 +1105,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                 Image {
                     id: spaceshipImage
                     z: 10
-                    source: "qrc:/resources/icons/onboarding/img_onboarding_congrats_investor.svg"
+                    source: "qrc:/res/icons/onboarding/img_onboarding_congrats_investor.svg"
                     sourceSize: Qt.size(120, 156)   // (120, 156) is base aspect ratio
                     anchors {
                         horizontalCenter: parent.horizontalCenter
@@ -1115,7 +1115,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                 }
                 Image {
                     id: trailImage1
-                    source: "qrc:/resources/icons/onboarding/img_onboarding_congrats_investor_ln1.svg"
+                    source: "qrc:/res/icons/onboarding/img_onboarding_congrats_investor_ln1.svg"
                     sourceSize: Qt.size(parent.width, parent.height-y)
                     anchors {
                         horizontalCenter: parent.horizontalCenter
@@ -1125,7 +1125,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                 }
                 Image {
                     id: trailImage2
-                    source: "qrc:/resources/icons/onboarding/img_onboarding_congrats_investor_ln2.svg"
+                    source: "qrc:/res/icons/onboarding/img_onboarding_congrats_investor_ln2.svg"
                     sourceSize: Qt.size(parent.width, parent.height-y)
                     anchors {
                         horizontalCenter: parent.horizontalCenter
@@ -1135,7 +1135,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                 }
                 Image {
                     id: trailImage3
-                    source: "qrc:/resources/icons/onboarding/img_onboarding_congrats_investor_ln3.svg"
+                    source: "qrc:/res/icons/onboarding/img_onboarding_congrats_investor_ln3.svg"
                     sourceSize: Qt.size(parent.width, parent.height-y)
                     anchors {
                         horizontalCenter: parent.horizontalCenter
@@ -1145,7 +1145,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                 }
                 Image {
                     id: cloudImage1
-                    source: "qrc:/resources/icons/onboarding/img_onboarding_congrats_investor_shp1.svg"
+                    source: "qrc:/res/icons/onboarding/img_onboarding_congrats_investor_shp1.svg"
                     sourceSize: Qt.size(132, 57)   // (132, 57) is base aspect ratio
                     anchors {
                         right: spaceshipImage.left
@@ -1155,7 +1155,7 @@ Etiam convallis lectus magna, quis scelerisque augue dapibus sit amet. Lorem ips
                 }
                 Image {
                     id: cloudImage2
-                    source: "qrc:/resources/icons/onboarding/img_onboarding_congrats_investor_shp2.svg"
+                    source: "qrc:/res/icons/onboarding/img_onboarding_congrats_investor_shp2.svg"
                     sourceSize: Qt.size(132, 57)   // (132, 57) is base aspect ratio
                     anchors {
                         bottom: spaceshipImage.top

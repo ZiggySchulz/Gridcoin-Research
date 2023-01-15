@@ -13,7 +13,7 @@ Window {
     minimumHeight: 450
     flags: Qt.Dialog
     Shortcut {
-        sequence: StandardKey.Close
+        sequences: [StandardKey.Close]
         onActivated: window.close()
     }
     Rectangle {
@@ -38,7 +38,7 @@ Window {
             spacing: 30
             property Item currentItem: informationTabButton
             Shortcut {
-                sequence: StandardKey.MoveToNextPage
+                sequences: [StandardKey.MoveToNextPage]
                 onActivated: {
                     switch(tabMenuRowLayout.currentItem) {
                     case informationTabButton:
@@ -59,7 +59,7 @@ Window {
                 }
             }
             Shortcut {
-                sequence: StandardKey.MoveToPreviousPage
+                sequences: [StandardKey.MoveToPreviousPage]
                 onActivated: {
                     switch(tabMenuRowLayout.currentItem) {
                     case informationTabButton:
@@ -89,7 +89,7 @@ Window {
                 Image {
                     id: informationIcon
                     sourceSize: Qt.size(30,30)
-                    source: MMPTheme.themeSelect("/resources/icons/tabs/ic_tab_info_light.svg", "/resources/icons/tabs/ic_tab_info_dark.svg")
+                    source: MMPTheme.themeSelect("qrc:/res/icons/tabs/ic_tab_info_light.svg", "qrc:/res/icons/tabs/ic_tab_info_dark.svg")
                     anchors {
                         top: parent.top
                         horizontalCenter: parent.horizontalCenter
@@ -116,7 +116,7 @@ Window {
                 Image {
                     id: networkTrafficIcon
                     sourceSize: Qt.size(30,30)
-                    source: MMPTheme.themeSelect("qrc:/resources/icons/tabs/ic_tab_net_traffic_light.svg", "qrc:/resources/icons/tabs/ic_tab_net_traffic_dark.svg")
+                    source: MMPTheme.themeSelect("qrc:/res/icons/tabs/ic_tab_net_traffic_light.svg", "qrc:/res/icons/tabs/ic_tab_net_traffic_dark.svg")
                     anchors {
                         top: parent.top
                         horizontalCenter: parent.horizontalCenter
@@ -143,7 +143,7 @@ Window {
                 Image {
                     id: consoleIcon
                     sourceSize: Qt.size(30,30)
-                    source: MMPTheme.themeSelect("/resources/icons/tabs/ic_tab_console_light.svg", "/resources/icons/tabs/ic_tab_console_dark.svg")
+                    source: MMPTheme.themeSelect("qrc:/res/icons/tabs/ic_tab_console_light.svg", "qrc:/res/icons/tabs/ic_tab_console_dark.svg")
                     anchors {
                         top: parent.top
                         horizontalCenter: parent.horizontalCenter
@@ -170,7 +170,7 @@ Window {
                 Image {
                     id: scraperIcon
                     sourceSize: Qt.size(30,30)
-                    source: MMPTheme.themeSelect("qrc:/resources/icons/tabs/ic_tab_cmd_line_light.svg", "qrc:/resources/icons/tabs/ic_tab_cmd_line_dark.svg")
+                    source: MMPTheme.themeSelect("qrc:/res/icons/tabs/ic_tab_cmd_line_light.svg", "qrc:/res/icons/tabs/ic_tab_cmd_line_dark.svg")
                     anchors {
                         top: parent.top
                         horizontalCenter: parent.horizontalCenter
@@ -198,7 +198,7 @@ Window {
                 Image {
                     id: peersIcon
                     sourceSize: Qt.size(30,30)
-                    source: MMPTheme.themeSelect("/resources/icons/tabs/ic_tab_nodes_light.svg", "/resources/icons/tabs/ic_tab_nodes_dark.svg")
+                    source: MMPTheme.themeSelect("qrc:/res/icons/tabs/ic_tab_nodes_light.svg", "qrc:/res/icons/tabs/ic_tab_nodes_dark.svg")
                     anchors {
                         top: parent.top
                         horizontalCenter: parent.horizontalCenter
@@ -470,7 +470,7 @@ Window {
             Button {
                 id: debugLogButton
                 text: qsTr("Event Log")
-                icon.source: MMPTheme.themeSelect("qrc:/resources/icons/buttons/ic_btn_log_light.svg", "qrc:/resources/icons/buttons/ic_btn_log_dark.svg")
+                icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_log_light.svg", "qrc:/res/icons/buttons/ic_btn_log_dark.svg")
                 anchors {
                     bottom: parent.bottom
                     right: parent.right

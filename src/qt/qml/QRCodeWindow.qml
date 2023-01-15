@@ -31,7 +31,7 @@ Window {
             Image {
                 id: qrRect
                 width: Math.min(height, background.width*0.5)
-                source: "resources/icons/buttons/ic_btn_qr_code_light.svg" //TODO change to render qr code
+                source: "qrc:/res/icons/buttons/ic_btn_qr_code_light.svg" //TODO change to render qr code
                 sourceSize: Qt.size(600, 600) //Remove to render at native image res
                 fillMode: Image.PreserveAspectFit
                 anchors {
@@ -102,7 +102,7 @@ Window {
         Button {
             id: saveButton
             text: qsTr("Save to File")
-            icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_save_qr_light.svg","resources/icons/buttons/ic_btn_save_qr_dark.svg")
+            icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_save_qr_light.svg","qrc:/res/icons/buttons/ic_btn_save_qr_dark.svg")
             anchors {
                 right: parent.right
                 bottom: parent.bottom
