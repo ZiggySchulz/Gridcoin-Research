@@ -13,7 +13,7 @@ Item {
             name: "manualRewardClaim"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_mrc.svg"
+                source: "qrc:/res/icons/events/ic_event_mrc.svg"
             }
         }
 
@@ -21,71 +21,71 @@ Item {
             name: "incomingTransaction"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_green.svg"
+                source: "qrc:/res/icons/events/ic_event_green.svg"
             }
         },
         State {
             name: "sentTransaction"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_red.svg"
+                source: "qrc:/res/icons/events/ic_event_red.svg"
             }
         },
         State {
             name: "proofOfResearch"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_purple.svg"
+                source: "qrc:/res/icons/events/ic_event_purple.svg"
             }
         },
         State {
             name: "proofOfResearchSideStakeReceive"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_purple.svg"
+                source: "qrc:/res/icons/events/ic_event_purple.svg"
             }
         },
         State {
             name: "proofOfResearchSideStakeSend"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_red.svg"
+                source: "qrc:/res/icons/events/ic_event_red.svg"
             }
         },
         State {
             name: "proofOfStake"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_yellow.svg"
+                source: "qrc:/res/icons/events/ic_event_yellow.svg"
             }
         },
         State {
             name: "proofOfStakeSideStakeReceive"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_yellow_purple.svg"
+                source: "qrc:/res/icons/events/ic_event_yellow_purple.svg"
             }
         },
         State {
             name: "orphaned"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/generic/ic_negative.svg"
+                source: "qrc:/res/icons/generic/ic_negative.svg"
             }
         },
         State {
             name: "superblock"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/superblock.svg"
+                source: "qrc:/res/icons/events/superblock.svg"
             }
         },
         State {
             name: "beaconAdvertisement"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/beacon_grey.svg"
-                //source: "resources/Icons/Status Bar/Beacon/ic_beacon_online_light.svg" //Generic beacon icon, doesn't seem designed for large scale
+                source: "qrc:/res/icons/events/beacon_grey.svg"
+                //source: "qrc:/res/Icons/Status Bar/Beacon/ic_beacon_online_light.svg" //Generic beacon icon, doesn't seem designed for large scale
             }
             PropertyChanges {
                 target: amountLabel
@@ -96,21 +96,21 @@ Item {
             name: "vote"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/voting.svg"
+                source: "qrc:/res/icons/events/voting.svg"
             }
         },
         State {
             name: "message"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/message.svg"
+                source: "qrc:/res/icons/events/message.svg"
             }
         },
         State {
             name: "inOut"
             PropertyChanges {
                 target: transactionIcon
-                source: "resources/icons/events/ic_event_green_red.svg"
+                source: "qrc:/res/icons/events/ic_event_green_red.svg"
             }
         }
     ]
@@ -119,7 +119,7 @@ Item {
         id: transactionIcon
         height: 30
         width: 30
-        source: "resources/icons/events/ic_event_purple.svg"
+        source: "qrc:/res/icons/events/ic_event_purple.svg"
         sourceSize: Qt.size(width, height)
         anchors {
             verticalCenter: parent.verticalCenter

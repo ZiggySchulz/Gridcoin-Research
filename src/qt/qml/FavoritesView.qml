@@ -195,7 +195,7 @@ Rectangle {
                         Button {
                             id: copyButton
                             visible: addressListView.currentIndex===index
-                            icon.source: MMPTheme.themeSelect("resources/icons/generic/ic_copy_light.svg","resources/icons/generic/ic_copy_dark.svg")
+                            icon.source: MMPTheme.themeSelect("qrc:/res/icons/generic/ic_copy_light.svg","qrc:/res/icons/generic/ic_copy_dark.svg")
                             anchors {
                                 top: parent.top
                                 bottom: parent.bottom
@@ -220,7 +220,7 @@ Rectangle {
                         id: addAddressButton
                         Layout.fillHeight: true
                         implicitWidth: 30
-                        icon.source: MMPTheme.themeSelect("resources/icons/generic/ic_add_light.svg","resources/icons/generic/ic_add_dark.svg")
+                        icon.source: MMPTheme.themeSelect("qrc:/res/icons/generic/ic_add_light.svg","qrc:/res/icons/generic/ic_add_dark.svg")
                         background: Item{}
                     }
                     Rectangle {
@@ -233,7 +233,7 @@ Rectangle {
                         id: removeAddressButton
                         Layout.fillHeight: true
                         implicitWidth: 30
-                        icon.source: MMPTheme.themeSelect("resources/icons/generic/ic_remove_light.svg","resources/icons/generic/ic_remove_dark.svg")
+                        icon.source: MMPTheme.themeSelect("qrc:/res/icons/generic/ic_remove_light.svg","qrc:/res/icons/generic/ic_remove_dark.svg")
                         background: Item{}
                     }
                     Rectangle {
@@ -271,7 +271,7 @@ Rectangle {
 
             Button {
                 text: qsTr("Show QR Code")
-                icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_qr_code_light.svg","resources/icons/buttons/ic_btn_qr_code_dark.svg")
+                icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_qr_code_light.svg","qrc:/res/icons/buttons/ic_btn_qr_code_dark.svg")
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
@@ -287,7 +287,7 @@ Rectangle {
             Button {
                 id: verifyMessageButton
                 text: qsTr("Verify Message")
-                icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_verify_light.svg","resources/icons/buttons/ic_btn_verify_dark.svg")
+                icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_verify_light.svg","qrc:/res/icons/buttons/ic_btn_verify_dark.svg")
                 anchors {
                     verticalCenter: parent.verticalCenter
                     right: parent.right
@@ -296,7 +296,7 @@ Rectangle {
             }
             Button {
                 text: qsTr("Sign Message")
-                icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_sign_light.svg","resources/icons/buttons/ic_btn_sign_dark.svg")
+                icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_sign_light.svg","qrc:/res/icons/buttons/ic_btn_sign_dark.svg")
                 anchors {
                     verticalCenter: parent.verticalCenter
                     right: verifyMessageButton.left
