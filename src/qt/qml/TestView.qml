@@ -39,12 +39,12 @@ ScrollView {
                 }
                 Button {
                     text: qsTr("Default")
-                    icon.source: MMPTheme.themeSelect("qrc:/resources/icons/buttons/ic_btn_verify_light.svg", "qrc:/resources/icons/buttons/ic_btn_verify_dark.svg")
+                    icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_verify_light.svg", "qrc:/res/icons/buttons/ic_btn_verify_dark.svg")
                     onPressed: console.log(Qt.locale())
                 }
 
                 Button {
-                    icon.source: MMPTheme.themeSelect("qrc:/resources/icons/buttons/ic_btn_verify_light.svg", "qrc:/resources/icons/buttons/ic_btn_verify_dark.svg")
+                    icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_verify_light.svg", "qrc:/res/icons/buttons/ic_btn_verify_dark.svg")
                 }
 
 
@@ -55,12 +55,12 @@ ScrollView {
 
                 Button {
                     text: qsTr("Disabled")
-                    icon.source: MMPTheme.themeSelect("qrc:/resources/icons/buttons/ic_btn_verify_light.svg", "qrc:/resources/icons/buttons/ic_btn_verify_dark.svg")
+                    icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_verify_light.svg", "qrc:/res/icons/buttons/ic_btn_verify_dark.svg")
                     enabled: false
                 }
 
                 Button {
-                    icon.source: MMPTheme.themeSelect("qrc:/resources/icons/buttons/ic_btn_verify_light.svg", "qrc:/resources/icons/buttons/ic_btn_verify_dark.svg")
+                    icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_verify_light.svg", "qrc:/res/icons/buttons/ic_btn_verify_dark.svg")
                     enabled: false
                 }
             }

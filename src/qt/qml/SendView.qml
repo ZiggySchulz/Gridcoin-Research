@@ -134,7 +134,7 @@ Rectangle {
                     }
                     Button {
                         id: clipboardButton
-                        icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_paste_light.svg","resources/icons/buttons/ic_btn_paste_dark.svg")
+                        icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_paste_light.svg","qrc:/res/icons/buttons/ic_btn_paste_dark.svg")
                         anchors {
                             verticalCenter: recipientLabel.verticalCenter
                             right: parent.right
@@ -143,7 +143,7 @@ Rectangle {
                     }
                     Button {
                         id: dropdownButton
-                        icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_open_menu_light.svg","resources/icons/buttons/ic_btn_open_menu_dark.svg")
+                        icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_open_menu_light.svg","qrc:/res/icons/buttons/ic_btn_open_menu_dark.svg")
                         anchors {
                             verticalCenter: recipientLabel.verticalCenter
                             right: clipboardButton.left
@@ -178,7 +178,7 @@ Rectangle {
                     }
                     Button {
                         id: attachFileButton
-                        icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_attach_light.svg","resources/icons/buttons/ic_btn_attach_dark.svg")
+                        icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_attach_light.svg","qrc:/res/icons/buttons/ic_btn_attach_dark.svg")
                         anchors {
                             verticalCenter: messageLabel.verticalCenter
                             right: parent.right
@@ -309,7 +309,7 @@ Rectangle {
 
                         Button {
                             id: removeButton
-                            icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_remove_light.svg","resources/icons/buttons/ic_btn_remove_dark.svg")
+                            icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_remove_light.svg","qrc:/res/icons/buttons/ic_btn_remove_dark.svg")
                             text: qsTr("Remove")
                             onPressed: outputModel.remove(index)
                             anchors {
@@ -320,7 +320,7 @@ Rectangle {
                         }
                         Button {
                             id: sendButton
-                            icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_send_light.svg","resources/icons/buttons/ic_btn_send_dark.svg")
+                            icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_send_light.svg","qrc:/res/icons/buttons/ic_btn_send_dark.svg")
                             text: qsTr("Send")
                             //onPressed: sendTransaction(recipient, message, label, amount)
                             anchors {
@@ -335,7 +335,7 @@ Rectangle {
 
             Button {
                 id: newOutputButton
-                icon.source: MMPTheme.themeSelect("resources/icons/buttons/ic_btn_add_light.svg", "resources/icons/buttons/ic_btn_add_dark.svg")
+                icon.source: MMPTheme.themeSelect("qrc:/res/icons/buttons/ic_btn_add_light.svg", "qrc:/res/icons/buttons/ic_btn_add_dark.svg")
                 text: qsTr("New Recipient")
                 anchors.horizontalCenter: parent.horizontalCenter
                 onPressed: outputModel.append({"recipient":"","message":"","label":""})

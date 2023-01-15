@@ -21,49 +21,49 @@ Rectangle {
         id: menuModel
         ListElement {
             label: qsTr("Overview")
-            lightImageSource: "resources/icons/menu/ic_menu_overview_white.svg"
-            darkImageSource: "resources/icons/menu/ic_menu_overview_blue.svg"
+            lightImageSource: "qrc:/res/icons/menu/ic_menu_overview_white.svg"
+            darkImageSource: "qrc:/res/icons/menu/ic_menu_overview_blue.svg"
             path: "OverviewResearcherView.qml"
         }
         ListElement {
             label: qsTr("Send")
-            lightImageSource: "resources/icons/menu/ic_menu_send_white.svg"
-            darkImageSource: "resources/icons/menu/ic_menu_send_blue.svg"
+            lightImageSource: "qrc:/res/icons/menu/ic_menu_send_white.svg"
+            darkImageSource: "qrc:/res/icons/menu/ic_menu_send_blue.svg"
             path: "SendView.qml"
         }
         ListElement {
             label: qsTr("Receive")
-            lightImageSource: "resources/icons/menu/ic_menu_receive_white.svg"
-            darkImageSource: "resources/icons/menu/ic_menu_receive_blue.svg"
+            lightImageSource: "qrc:/res/icons/menu/ic_menu_receive_white.svg"
+            darkImageSource: "qrc:/res/icons/menu/ic_menu_receive_blue.svg"
             path: "ReceiveView.qml"
         }
         ListElement {
             label: qsTr("History")
-            lightImageSource: "resources/icons/menu/ic_menu_history_white.svg"
-            darkImageSource: "resources/icons/menu/ic_menu_history_blue.svg"
+            lightImageSource: "qrc:/res/icons/menu/ic_menu_history_white.svg"
+            darkImageSource: "qrc:/res/icons/menu/ic_menu_history_blue.svg"
             path: "HistoryView.qml"
         }
         ListElement {
             label: qsTr("Favourites")
-            lightImageSource: "resources/icons/menu/ic_menu_favorites_white.svg"
-            darkImageSource: "resources/icons/menu/ic_menu_favorites_blue.svg"
+            lightImageSource: "qrc:/res/icons/menu/ic_menu_favorites_white.svg"
+            darkImageSource: "qrc:/res/icons/menu/ic_menu_favorites_blue.svg"
             path: "FavoritesView.qml"
         }
         ListElement {
             label: qsTr("Polls")
-            lightImageSource: "resources/icons/menu/ic_menu_polls_white.svg"
-            darkImageSource: "resources/icons/menu/ic_menu_polls_blue.svg"
+            lightImageSource: "qrc:/res/icons/menu/ic_menu_polls_white.svg"
+            darkImageSource: "qrc:/res/icons/menu/ic_menu_polls_blue.svg"
             path: "PollView.qml"
         }
 //        ListElement {
 //            label: qsTr("News")
-//            lightImageSource: "resources/icons/menu/ic_menu_news_white.svg"
-//            darkImageSource: "resources/icons/menu/ic_menu_news_blue.svg"
+//            lightImageSource: "qrc:/res/icons/menu/ic_menu_news_white.svg"
+//            darkImageSource: "qrc:/res/icons/menu/ic_menu_news_blue.svg"
 //        }
         ListElement {
             label: qsTr("Settings")
-            lightImageSource: "resources/icons/menu/ic_menu_settings_white.svg"
-            darkImageSource: "resources/icons/menu/ic_menu_settings_blue.svg"
+            lightImageSource: "qrc:/res/icons/menu/ic_menu_settings_white.svg"
+            darkImageSource: "qrc:/res/icons/menu/ic_menu_settings_blue.svg"
             path: "SettingsView.qml"
         }
     }
@@ -97,7 +97,7 @@ Rectangle {
         }
         Image {
             //id: gridcoinLogo
-            source: "resources/icons/logos/ic_logo_app_gradient_white.svg"
+            source: "qrc:/res/icons/logos/ic_logo_app_gradient_white.svg"
             anchors.centerIn: parent
             width: parent.width - 20
             height: parent.height - 20
@@ -152,7 +152,7 @@ Rectangle {
             height: buttonHeight+15
             width: parent.width-30
             labelText: qsTr("Lock Wallet")
-            imagePath: MMPTheme.themeSelect("resources/icons/menu/ic_menu_lock_white.svg","resources/icons/menu/ic_menu_lock_blue.svg")
+            imagePath: MMPTheme.themeSelect("qrc:/res/icons/menu/ic_menu_lock_white.svg","qrc:/res/icons/menu/ic_menu_lock_blue.svg")
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: {
                 if (MMPTheme.isLightTheme){
@@ -165,7 +165,7 @@ Rectangle {
     }
     Image {
         id: boinc
-        source: "resources/icons/logos/ic_logo_boinc_color.svg"
+        source: "qrc:/res/icons/logos/ic_logo_boinc_color.svg"
         width: parent.width-30
         height: 30
         sourceSize: Qt.size(width, height)
