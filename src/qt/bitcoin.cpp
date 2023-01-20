@@ -41,6 +41,16 @@
 #include <QSplashScreen>
 #include <QLibraryInfo>
 #include <QProcess>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QFont>
+#include <QClipboard>
+#include <QDir>
+#include <QFontDatabase>
+#include <QIcon>
+#include <QQuickStyle>
+#include <QQmlContext>
+
 
 // This eliminates the linter false positive on double include of QtPlugin
 #if (defined(BITCOIN_NEED_QT_PLUGINS) && !defined(_BITCOIN_QT_PLUGINS_INCLUDED)) || defined(QT_STATICPLUGIN)
@@ -617,22 +627,23 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
     uiInterface.UpdateMessageBox_connect(UpdateMessageBox);
 
-    QSplashScreen splash(QPixmap(":/images/splash"));
-    if (gArgs.GetBoolArg("-splash", true) && !gArgs.GetBoolArg("-min"))
-    {
-        splash.setEnabled(false);
-        splash.show();
-        splashref = &splash;
-    }
+    // QSplashScreen splash(QPixmap(":/images/splash"));
+    // if (gArgs.GetBoolArg("-splash", true) && !gArgs.GetBoolArg("-min"))
+    // {
+    //     splash.setEnabled(false);
+    //     splash.show();
+    //     splashref = &splash;
+    // }
 
     app.processEvents();
 
     app.setQuitOnLastWindowClosed(false);
+    app.setWindowIcon(QIcon(":/res/icons/logos/ic_logo_app_gradient_white.svg"));
 
     try
     {
-        BitcoinGUI window;
-        guiref = &window;
+        //BitcoinGUI window;
+        //guiref = &window;
 
         LogPrintf("Starting Gridcoin");
 
@@ -654,33 +665,60 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 UninterruptibleSleep(std::chrono::milliseconds{100});
             }
 
-            if (splashref)
-                splash.finish(&window);
+            // if (splashref)
+            //     splash.finish(&window);
 
             if (!fRequestShutdown) {
                 // Put this in a block, so that the Model objects are cleaned up before
                 // calling Shutdown().
+                 // Load fonts
+                QDir dir{":/fonts/"};
+                for (auto file : dir.entryList(QDir::Files))
+                {
+                    QFontDatabase::addApplicationFont(":/fonts/" + file);
+                }
+                QFont font = QFont("SF Pro Text");
+                font.setPixelSize(12);
+                app.setFont(font);
 
+                //Set the style for quickcontrols2
+                QQuickStyle::setStyle(":/qml/MMPControls");
+
+                QQmlApplicationEngine engine;
+                engine.addImportPath(":/plugins/");
+                const QUrl url(QStringLiteral("qrc:/qml/WindowManager.qml"));
+                // const QUrl url(QStringLiteral("src/qt/qml/TestView.qml"));
+                QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+                                &app, [url](QObject *obj, const QUrl &objUrl) {
+                    if (!obj && url == objUrl)
+                        QCoreApplication::exit(-1);
+                }, Qt::QueuedConnection);
+                engine.load(url);
+                
                 ClientModel clientModel(&optionsModel);
                 WalletModel walletModel(pwalletMain, &optionsModel);
                 ResearcherModel researcherModel;
                 MRCModel mrcModel(&walletModel, &clientModel, &researcherModel);
                 VotingModel votingModel(clientModel, optionsModel, walletModel);
 
-                window.setResearcherModel(&researcherModel);
-                window.setClientModel(&clientModel);
-                window.setWalletModel(&walletModel);
-                window.setMRCModel(&mrcModel);
-                window.setVotingModel(&votingModel);
-
+                // window.setResearcherModel(&researcherModel);
+                // window.setClientModel(&clientModel);
+                // window.setWalletModel(&walletModel);
+                // window.setMRCModel(&mrcModel);
+                // window.setVotingModel(&votingModel);
+                // engine.rootContext()->setContextProperty("_clientModel", clientModel);
+                // engine.rootContext()->setContextProperty("_walletModel", walletModel);
+                // engine.rootContext()->setContextProperty("_researcherModel", researcherModel);
+                // engine.rootContext()->setContextProperty("_mrcModel", mrcModel);
+                // engine.rootContext()->setContextProperty("_votingModel", votingModel);
                 // If -min option passed, start window minimized.
                 if(gArgs.GetBoolArg("-min"))
                 {
-                    window.showMinimized();
+                    // window.showMinimized();
                 }
                 else
                 {
-                    window.show();
+                    // window.show();
                 }
 
                 // Place this here as guiref has to be defined if we don't want to lose URIs
@@ -697,10 +735,10 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
                 app.exec();
 
-                window.hide();
-                window.setClientModel(nullptr);
-                window.setWalletModel(nullptr);
-                window.setResearcherModel(nullptr);
+                // window.hide();
+                // window.setClientModel(nullptr);
+                // window.setWalletModel(nullptr);
+                // window.setResearcherModel(nullptr);
                 guiref = nullptr;
             }
             // Shutdown the core and its threads, but don't exit Bitcoin-Qt here
