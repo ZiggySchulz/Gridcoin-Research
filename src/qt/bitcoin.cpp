@@ -708,11 +708,12 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 // window.setWalletModel(&walletModel);
                 // window.setMRCModel(&mrcModel);
                 // window.setVotingModel(&votingModel);
-                // engine.rootContext()->setContextProperty("_clientModel", clientModel);
-                // engine.rootContext()->setContextProperty("_walletModel", walletModel);
-                // engine.rootContext()->setContextProperty("_researcherModel", researcherModel);
-                // engine.rootContext()->setContextProperty("_mrcModel", mrcModel);
-                // engine.rootContext()->setContextProperty("_votingModel", votingModel);
+                QQmlContext* context = engine.rootContext();
+                context->setContextProperty("_clientModel", &clientModel);
+                context->setContextProperty("_walletModel", &walletModel);
+                context->setContextProperty("_researcherModel", &researcherModel);
+                context->setContextProperty("_mrcModel", &mrcModel);
+                context->setContextProperty("_votingModel", &votingModel);
                 // If -min option passed, start window minimized.
                 if(gArgs.GetBoolArg("-min"))
                 {

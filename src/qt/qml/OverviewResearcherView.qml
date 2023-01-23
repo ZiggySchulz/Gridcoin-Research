@@ -521,9 +521,9 @@ Rectangle {
         }
         Column {
             id: networkValuesColumn
-            property int blocks: 47197
-            property real difficulty: 6871.92793688
-            property real netWeight: 17.02145689
+            property int blocks: _clientModel.numBlocks
+            property real difficulty: _clientModel.difficulty
+            property real netWeight: _clientModel.netWeight
             property real coinWeight: 72283
             spacing: 5
             clip: true
@@ -553,7 +553,7 @@ Rectangle {
 
             Text {
                 id: netWeightValue
-                text: networkValuesColumn.netWeight.toLocaleString(Qt.locale(), 'f', 8)
+                text: networkValuesColumn.netWeight.toLocaleString(Qt.locale(), 'f', 0)
                 color: MMPTheme.lightTextColor
                 horizontalAlignment: Text.AlignRight
                 anchors.right: parent.right

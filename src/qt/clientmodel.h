@@ -23,6 +23,12 @@ QT_END_NAMESPACE
 class ClientModel : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(int numConnections READ getNumConnections NOTIFY numConnectionsChanged)
+    Q_PROPERTY(int numBlocks READ getNumBlocks NOTIFY numBlocksChanged)
+    Q_PROPERTY(double difficulty READ getDifficulty NOTIFY difficultyChanged)
+    Q_PROPERTY(double netWeight READ getNetWeight NOTIFY minerStatusChanged)
+    Q_PROPERTY(bool isTestNet READ isTestNet)
+    
 public:
     explicit ClientModel(OptionsModel* optionsModel, QObject* parent = nullptr);
     ~ClientModel();
