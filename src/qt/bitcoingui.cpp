@@ -828,6 +828,15 @@ void BitcoinGUI::setResearcherModel(ResearcherModel *researcherModel)
 
     updateBeaconIcon();
     connect(researcherModel, &ResearcherModel::beaconChanged, this, &BitcoinGUI::updateBeaconIcon);
+
+    QTimer *beacon_status_update_timer = new QTimer(this);
+
+    // This timer trigger is to support updating the beacon age and time to expiration in the tooltip.
+    // Once a minute is sufficient.
+    connect(beacon_status_update_timer, &QTimer::timeout, this, &BitcoinGUI::updateBeaconIcon);
+
+    // Check every minute
+    beacon_status_update_timer->start(1000 * 60);
 }
 
 void BitcoinGUI::setMRCModel(MRCModel *mrcModel)
@@ -1859,23 +1868,32 @@ void BitcoinGUI::updateBeaconIcon()
     labelBeaconIcon->show();
     labelBeaconIcon->setPixmap(GRC::ScaleStatusIcon(this, researcherModel->getBeaconStatusIcon()));
 
-    if (researcherModel->beaconExpired()) {
+    if (researcherModel->hasPendingBeacon()) {
+        labelBeaconIcon->setToolTip(tr("CPID: %1\n"
+                                       "Time left to activate: %2"
+                                       "%3")
+                                    .arg(researcherModel->formatCpid(),
+                                         researcherModel->formatTimeToPendingBeaconExpiration(),
+                                         researcherModel->formatBeaconStatus()));
+    } else if (researcherModel->beaconExpired()) {
         labelBeaconIcon->setToolTip(tr("CPID: %1\n"
                                        "Beacon age: %2\n"
                                        "Current beacon expired!\n"
                                        "%3")
-                                    .arg(researcherModel->formatCpid())
-                                    .arg(researcherModel->formatBeaconAge())
-                                    .arg(researcherModel->formatBeaconStatus()));
-    } else {
+                                    .arg(researcherModel->formatCpid(),
+                                         researcherModel->formatBeaconAge(),
+                                         researcherModel->formatBeaconStatus()));
+    } else if (researcherModel->hasActiveBeacon()) {
         labelBeaconIcon->setToolTip(tr("CPID: %1\n"
                                        "Beacon age: %2\n"
                                        "Expires: %3\n"
                                        "%4")
-                                    .arg(researcherModel->formatCpid())
-                                    .arg(researcherModel->formatBeaconAge())
-                                    .arg(researcherModel->formatTimeToBeaconExpiration())
-                                    .arg(researcherModel->formatBeaconStatus()));
+                                    .arg(researcherModel->formatCpid(),
+                                         researcherModel->formatBeaconAge(),
+                                         researcherModel->formatTimeToBeaconExpiration(),
+                                         researcherModel->formatBeaconStatus()));
+    } else {
+        labelBeaconIcon->setToolTip(researcherModel->formatBeaconStatus());
     }
 }
 
