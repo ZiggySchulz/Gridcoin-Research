@@ -82,6 +82,7 @@ public:
 class ResearcherModel : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString status READ formatStatus NOTIFY researcherChanged)
 
 public:
     ResearcherModel();
