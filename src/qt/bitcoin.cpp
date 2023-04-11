@@ -671,7 +671,8 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
             if (!fRequestShutdown) {
                 // Put this in a block, so that the Model objects are cleaned up before
                 // calling Shutdown().
-                 // Load fonts
+
+                // Load fonts
                 QDir dir{":/fonts/"};
                 for (auto file : dir.entryList(QDir::Files))
                 {

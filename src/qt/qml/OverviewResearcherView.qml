@@ -291,7 +291,7 @@ Rectangle {
         }
         Column {
             id: dataValuesColumn
-            property string status: qsTr("BOINC Mining")
+            property string status: _researcherModel.status
             property string projects: "lhc@home"
             property real rr: 442.71
             property real tts: 1.14
