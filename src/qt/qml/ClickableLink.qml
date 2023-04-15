@@ -1,3 +1,5 @@
+// Blue text with icon showing that the text is an external link
+// Use by settinging urlString and optionally displayString
 import QtQuick 2.15
 import MMPTheme 1.0
 

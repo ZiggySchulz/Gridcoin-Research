@@ -1,3 +1,4 @@
+// Styled item for the top of tables with column headers
 import QtQuick 2.15
 import MMPTheme 1.0
 

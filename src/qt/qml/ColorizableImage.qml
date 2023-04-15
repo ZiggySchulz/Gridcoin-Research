@@ -1,3 +1,4 @@
+// Image that can be tinted a specified color using tintColor
 import QtQuick 2.15
 import QtGraphicalEffects 1.15
 Item {

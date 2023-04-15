@@ -1,3 +1,4 @@
+// A visual item that shows the current page in the ondboarding window
 import QtQuick 2.15
 import MMPTheme 1.0
 Item {

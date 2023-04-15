@@ -1,3 +1,4 @@
+// Window which shows a specific poll's details
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15

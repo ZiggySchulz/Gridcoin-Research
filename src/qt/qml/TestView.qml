@@ -1,3 +1,4 @@
+// A temporary view used for testing controls, etc. Should not appear in a release.
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import MMPTheme 1.0
