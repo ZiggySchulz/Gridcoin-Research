@@ -1,3 +1,4 @@
+// A panel for the overview view showing the recent polls
 import QtQuick 2.15
 import MMPTheme 1.0
 Rectangle {

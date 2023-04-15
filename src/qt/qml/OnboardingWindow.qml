@@ -1,3 +1,4 @@
+// A window that takes the user through the Gridcoin onboarding process
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.15

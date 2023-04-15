@@ -1,3 +1,4 @@
+// The root of the qml application. Manages showing what would be root level windows
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQml 2.15
