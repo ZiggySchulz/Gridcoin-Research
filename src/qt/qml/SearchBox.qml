@@ -1,3 +1,4 @@
+// Styled search box
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import MMPTheme 1.0

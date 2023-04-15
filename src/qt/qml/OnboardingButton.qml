@@ -1,3 +1,4 @@
+// A button in the theme used by the onboarding windows
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import MMPTheme 1.0

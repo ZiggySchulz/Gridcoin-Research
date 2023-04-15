@@ -1,3 +1,4 @@
+// A question mark icon that provides information when hovered
 import QtQuick 2.15
 import MMPTheme 1.0
 MouseArea {

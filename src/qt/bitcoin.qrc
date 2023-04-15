@@ -505,16 +505,12 @@
         <file>qml/PollView.qml</file>
         <file>qml/PollVoteWindow.qml</file>
         <file>qml/QRCodeWindow.qml</file>
-        <file>qml/RadioButton.qml</file>
         <file>qml/ReceiveView.qml</file>
         <file>qml/RecentPollPanel.qml</file>
         <file>qml/RecentTransactionItem.qml</file>
-        <file>qml/ScrollBar.qml</file>
-        <file>qml/ScrollIndicator.qml</file>
         <file>qml/SearchBox.qml</file>
         <file>qml/SendView.qml</file>
         <file>qml/SettingsView.qml</file>
-        <file>qml/SpinBox.qml</file>
         <file>qml/SplashScreen.qml</file>
         <file>qml/StatusFooter.qml</file>
         <file>qml/TableFooter.qml</file>

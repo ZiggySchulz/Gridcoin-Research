@@ -1,3 +1,4 @@
+// Small class to neaten qml code. Use by defining radius
 import QtQuick 2.15
 
 Rectangle {

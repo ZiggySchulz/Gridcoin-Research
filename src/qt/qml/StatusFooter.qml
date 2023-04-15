@@ -1,3 +1,4 @@
+// Footer for the main window showing the current wallet status
 import QtQuick 2.15
 import MMPTheme 1.0
 Rectangle {

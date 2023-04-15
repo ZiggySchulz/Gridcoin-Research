@@ -1,3 +1,4 @@
+// A window showing the QR code for an address
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
