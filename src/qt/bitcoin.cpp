@@ -44,7 +44,6 @@
 #include <QLibraryInfo>
 #include <QProcess>
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
 #include <QFont>
 #include <QClipboard>
 #include <QDir>
