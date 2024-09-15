@@ -51,6 +51,7 @@
 #include <QIcon>
 #include <QQuickStyle>
 #include <QQmlContext>
+#include <QQmlApplicationEngine>
 
 
 // This eliminates the linter false positive on double include of QtPlugin
