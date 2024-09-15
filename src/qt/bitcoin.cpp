@@ -53,7 +53,6 @@
 #include <QQmlContext>
 #include <QQmlApplicationEngine>
 
-
 // This eliminates the linter false positive on double include of QtPlugin
 #if (defined(BITCOIN_NEED_QT_PLUGINS) && !defined(_BITCOIN_QT_PLUGINS_INCLUDED)) || defined(QT_STATICPLUGIN)
 #include <QtPlugin>
