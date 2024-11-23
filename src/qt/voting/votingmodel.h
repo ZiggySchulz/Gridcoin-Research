@@ -20,9 +20,6 @@ namespace GRC {
 class PollRegistry;
 }
 
-QT_BEGIN_NAMESPACE
-class QStringList;
-QT_END_NAMESPACE
 
 class ClientModel;
 class OptionsModel;

@@ -120,14 +120,21 @@ option(BUNDLED_QT       "Use the bundled version of Qt" ${HUNTER_ENABLED})
 # Handle dependencies
 # ===================
 
-set(QT5_MINIMUM_VERSION 5.9.5)
-set(QT5_COMPONENTS Concurrent Core Gui LinguistTools Network Widgets)
-set(QT5_HUNTER_COMPONENTS qtbase qttools)
+set(QT6_MINIMUM_VERSION 6.2)
+set(QT6_COMPONENTS 
+    Concurrent 
+    Core 
+    Gui 
+    LinguistTools 
+    Network 
+    Widgets
+)
+set(QT6_HUNTER_COMPONENTS qtbase qttools)
 if(USE_DBUS)
-    list(APPEND QT5_COMPONENTS DBus)
+    list(APPEND QT6_COMPONENTS DBus)
 endif()
 if(ENABLE_TESTS)
-    list(APPEND QT5_COMPONENTS Test)
+    list(APPEND QT6_COMPONENTS Test)
 endif()
 
 set(BOOST_MINIMUM_VERSION 1.63.0)
@@ -190,23 +197,12 @@ endif()
 
 if(ENABLE_GUI)
     if(BUNDLED_QT)
-        hunter_add_package(Qt COMPONENTS ${QT5_HUNTER_COMPONENTS})
+        hunter_add_package(Qt COMPONENTS ${QT6_HUNTER_COMPONENTS})
     endif()
-    find_package(Qt5 ${QT5_MINIMUM_VERSION} COMPONENTS ${QT5_COMPONENTS} REQUIRED)
+    find_package(Qt6 ${QT6_MINIMUM_VERSION} COMPONENTS ${QT6_COMPONENTS} REQUIRED)
 
     if(ENABLE_QRENCODE)
         pkg_check_modules(QRENCODE REQUIRED IMPORTED_TARGET libqrencode)
-    endif()
-
-    # Compatibility macros
-    if(Qt5Core_VERSION VERSION_LESS 5.15.0)
-        macro(qt_create_translation)
-            qt5_create_translation(${ARGN})
-        endmacro()
-
-        macro(qt_add_translation)
-            qt5_add_translation(${ARGN})
-        endmacro()
     endif()
 endif()
 

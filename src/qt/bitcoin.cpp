@@ -37,7 +37,6 @@
 #include <QMessageBox>
 #include <QGridLayout>
 #include <QDebug>
-#include <QTextCodec>
 #include <QLocale>
 #include <QTranslator>
 #include <QSplashScreen>
@@ -289,10 +288,6 @@ int main(int argc, char *argv[])
         qputenv("QT_QPA_PLATFORM", "windows:fontengine=freetype");
     }
 #endif
-
-    // Generate high-dpi pixmaps
-    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     // Initiate the app here to support choosing the data directory.
     Q_INIT_RESOURCE(bitcoin);

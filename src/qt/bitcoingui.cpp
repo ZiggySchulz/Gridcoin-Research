@@ -77,7 +77,9 @@
 #include <QDesktopServices> // for opening URLs
 #include <QUrl>
 #include <QStyle>
-#include <QDesktopWidget>
+#include <QScreen>
+#include <QAction>
+#include <QActionGroup>
 
 #include <boost/lexical_cast.hpp>
 
@@ -118,8 +120,7 @@ BitcoinGUI::BitcoinGUI(QWidget* parent)
 
     if (!restoreGeometry(settings.value(window_geometry_key).toByteArray())) {
         // Restore failed (perhaps missing setting), center the window
-        setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter,QDesktopWidget().availableGeometry(this).size()
-                                        * 0.4,QDesktopWidget().availableGeometry(this)));
+        move(screen()->geometry().center() - frameGeometry().center());
     }
 
     QFontDatabase::addApplicationFont(":/fonts/inter-bold");
@@ -429,7 +430,7 @@ void BitcoinGUI::createActions()
     resetblockchainAction->setToolTip(tr("Remove blockchain data and start chain from zero"));
 
     m_mask_values_action = new QAction(tr("&Mask values"), this);
-    m_mask_values_action->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_M));
+    m_mask_values_action->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M));
     m_mask_values_action->setStatusTip(tr("Mask the values in the Overview screen"));
     m_mask_values_action->setCheckable(true);
 
