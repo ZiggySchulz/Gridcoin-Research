@@ -1,3 +1,5 @@
+add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
+
 # Translations
 # ============
 add_subdirectory(locale)
@@ -141,11 +143,11 @@ set_source_files_properties(
 # =================
 
 target_link_libraries(gridcoinqt PUBLIC
-    Qt5::Concurrent
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Network
-    Qt5::Widgets
+    Qt6::Concurrent
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Network
+    Qt6::Widgets
     gridcoin_util
 )
 
@@ -179,13 +181,21 @@ add_dependencies(gridcoinqt gridcoinqt_l10n)
 # Application
 # ===========
 
-add_executable(gridcoinresearch WIN32 MACOSX_BUNDLE bitcoin.cpp)
+add_executable(gridcoinresearch bitcoin.cpp)
 
 target_link_libraries(gridcoinresearch PRIVATE
     ${RUNTIME_LIBS}
-    Qt5::Widgets
+    Qt6::Widgets
     gridcoin_util
     gridcoinqt
+)
+
+set_target_properties(gridcoinresearch PROPERTIES
+    MACOSX_BUNDLE_GUI_IDENTIFIER gridcoin.us
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
 )
 
 if(UNIX AND NOT APPLE)
