@@ -11,6 +11,8 @@ target_link_libraries(test_gridcoin-qt PRIVATE
     ${RUNTIME_LIBS}
     ${QT}::Test
     ${QT}::Widgets
+    Qt6::Test
+    Qt6::Widgets
     gridcoin_util
     gridcoinqt
 )
