@@ -26,8 +26,8 @@ jobs:
                       deps: >-
                           libminiupnpc-dev
                           libqrencode-dev
-                          qtbase5-dev
-                          qttools5-dev
+                          qt6-base-dev
+                          qt6-tools-dev
                       options: >-
                           -DENABLE_GUI=ON
                           -DENABLE_QRENCODE=ON
@@ -127,10 +127,10 @@ jobs:
                       deps: >-
                           miniupnpc
                           qrencode
-                          qt@5
+                          qt@6
                       options: >-
                           -DENABLE_GUI=ON
-                          -DQt5_DIR=$(brew --prefix qt@5)/lib/cmake/Qt5
+                          -DQt6_DIR=$(brew --prefix qt@6)/lib/cmake/Qt6
                           -DENABLE_QRENCODE=ON
                           -DENABLE_UPNP=ON
                     - tag: system-libs
@@ -217,8 +217,8 @@ jobs:
                       deps: >-
                           miniupnpc:p
                           qrencode:p
-                          qt5-base:p
-                          qt5-tools:p
+                          qt6-base:p
+                          qt6-tools:p
                       options: >-
                           -DENABLE_GUI=ON
                           -DENABLE_QRENCODE=ON
@@ -274,3 +274,80 @@ jobs:
                   name: testlog-msys-${{matrix.tag}}
                   path: ${{github.workspace}}\build\Testing\Temporary\LastTest.log
                   retention-days: 7
+    
+    test-windows-native:
+        runs-on: windows-latest
+
+        env:
+            CCACHE_DIR: ${{github.workspace}}\ccache
+            CCACHE_MAXSIZE: 400M
+            CCACHE_COMPILERCHECK: content
+
+        strategy:
+            matrix:
+                tag:
+                    - minimal
+                    - no-asm
+                    - gui-full
+                include:
+                    - tag: no-asm
+                      cmake_options: -DUSE_ASM=OFF
+                    - tag: gui-full
+                      cmake_options: -DENABLE_GUI=ON -DENABLE_QRENCODE=ON -DENABLE_UPNP=ON
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Configure Developer Command Prompt for Microsoft Visual C++
+              uses: ilammy/msvc-dev-cmd@v1
+              with:
+                  arch: x64
+
+            - name: Install dependencies (vcpkg)
+              run: |
+                  git clone https://github.com/microsoft/vcpkg.git
+                  cd vcpkg
+                  .\bootstrap-vcpkg.bat -disableMetrics
+                  .\vcpkg install boost libzip openssl zlib libqrencode miniupnpc qtbase qttools --triplet x64-windows
+
+            - name: Configure CMake
+              run: cmake
+                  -B ./build
+                  -G Ninja
+                  -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+                  -DCMAKE_INSTALL_PREFIX="./install"
+                  -DCMAKE_C_COMPILER_LAUNCHER=ccache
+                  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+                  -DENABLE_TESTS=ON
+                  ${{ matrix.cmake_options }}
+
+            - name: Restore ccache
+              uses: actions/cache/restore@v4
+              if: always()
+              with:
+                  path: ${{ env.CCACHE_DIR }}
+                  key: ccache-windows-native-${{ matrix.tag }}-${{ github.run_id }}
+                  restore-keys: ccache-windows-native-${{ matrix.tag }}-
+
+            - name: Build
+              run: cmake --build ./build -v -j $env:NUMBER_OF_PROCESSORS
+
+            - name: Save ccache
+              uses: actions/cache/save@v4
+              if: always()
+              with:
+                  path: ${{ env.CCACHE_DIR }}
+                  key: ccache-windows-native-${{ matrix.tag }}-${{ github.run_id }}
+
+            - name: Run tests
+              run: ctest --test-dir ./build -j $env:NUMBER_OF_PROCESSORS -C Release
+
+            - name: Upload test logs
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: testlog-windows-native-${{ matrix.tag }}
+                  path: ${{ github.workspace }}\build\Testing\Temporary\LastTest.log
+                  retention-days: 7
+

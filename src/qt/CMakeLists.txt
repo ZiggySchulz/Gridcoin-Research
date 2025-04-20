@@ -164,7 +164,7 @@ endif()
 target_compile_definitions(gridcoinqt PUBLIC HAVE_CONFIG_H)
 
 if(USE_DBUS)
-    target_link_libraries(gridcoinqt PUBLIC Qt5::DBus)
+    target_link_libraries(gridcoinqt PUBLIC Qt6::DBus)
 endif()
 
 if(ENABLE_UPNP)
