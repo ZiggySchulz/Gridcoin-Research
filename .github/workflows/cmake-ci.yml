@@ -299,6 +299,30 @@ jobs:
               with:
                   arch: x64
 
+            - name: Get tool information
+              shell: pwsh
+              run: |
+                cmake -version | Tee-Object -FilePath "cmake_version"
+                Write-Output "---"
+                msbuild -version | Tee-Object -FilePath "msbuild_version"
+                $env:VCToolsVersion | Tee-Object -FilePath "toolset_version"
+                py -3 --version
+                Write-Host "PowerShell version $($PSVersionTable.PSVersion.ToString())"
+                bash --version
+
+            - name: vcpkg tools cache
+              uses: actions/cache@v4
+              with:
+                path: C:/vcpkg/downloads/tools
+                key: ${{ github.job }}-vcpkg-tools
+
+            - name: Restore vcpkg binary cache
+              uses: actions/cache/restore@v4
+              id: vcpkg-binary-cache
+              with:
+                path: ~/AppData/Local/vcpkg/archives
+                key: ${{ github.job }}-vcpkg-binary-${{ hashFiles('cmake_version', 'msbuild_version', 'toolset_version', 'vcpkg.json') }}
+                
             - name: Install dependencies (vcpkg)
               run: |
                   git clone https://github.com/microsoft/vcpkg.git
@@ -317,23 +341,14 @@ jobs:
                   -DENABLE_TESTS=ON
                   ${{ matrix.cmake_options }}
 
-            - name: Restore ccache
-              uses: actions/cache/restore@v4
-              if: always()
+            - name: Save vcpkg binary cache
+              uses: actions/cache/save@v4
               with:
-                  path: ${{ env.CCACHE_DIR }}
-                  key: ccache-windows-native-${{ matrix.tag }}-${{ github.run_id }}
-                  restore-keys: ccache-windows-native-${{ matrix.tag }}-
+                path: ~/AppData/Local/vcpkg/archives
+                key: ${{ github.job }}-vcpkg-binary-${{ hashFiles('cmake_version', 'msbuild_version', 'toolset_version', 'vcpkg.json') }}
 
             - name: Build
               run: cmake --build ./build -v -j $env:NUMBER_OF_PROCESSORS
-
-            - name: Save ccache
-              uses: actions/cache/save@v4
-              if: always()
-              with:
-                  path: ${{ env.CCACHE_DIR }}
-                  key: ccache-windows-native-${{ matrix.tag }}-${{ github.run_id }}
 
             - name: Run tests
               run: ctest --test-dir ./build -j $env:NUMBER_OF_PROCESSORS -C Release
