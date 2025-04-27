@@ -98,6 +98,7 @@ add_library(gridcoinqt STATIC
 
     bitcoin.qrc
     bitcoin_locale.qrc
+    qml/qml.qrc
 )
 
 if(WIN32)
@@ -145,6 +146,8 @@ target_link_libraries(gridcoinqt PUBLIC
     ${QT}::Gui
     ${QT}::Network
     ${QT}::Widgets
+    ${QT}::Qml
+    ${QT}::QuickControls2
     gridcoin_util
 )
 

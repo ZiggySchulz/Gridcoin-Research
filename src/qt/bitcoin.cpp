@@ -42,6 +42,9 @@
 #include <QSplashScreen>
 #include <QLibraryInfo>
 #include <QProcess>
+#include <QQmlApplicationEngine>
+#include <QQuickStyle>
+#include <QQmlContext>
 
 // This eliminates the linter false positive on double include of QtPlugin
 #if (defined(BITCOIN_NEED_QT_PLUGINS) && !defined(_BITCOIN_QT_PLUGINS_INCLUDED)) || defined(QT_STATICPLUGIN)
@@ -292,6 +295,7 @@ int main(int argc, char *argv[])
     // Initiate the app here to support choosing the data directory.
     Q_INIT_RESOURCE(bitcoin);
     Q_INIT_RESOURCE(bitcoin_locale);
+    Q_INIT_RESOURCE(qml);
 
     RegisterMetaTypes();
     QApplication app(argc, argv);
@@ -356,6 +360,7 @@ int main(int argc, char *argv[])
     //
     if (!gArgs.IsArgSet("-style")) {
         app.setStyle("Fusion");
+        QQuickStyle::setStyle("Fusion");
     }
 #endif
 
@@ -628,8 +633,8 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
     try
     {
-        BitcoinGUI window;
-        guiref = &window;
+        // BitcoinGUI window;
+        // guiref = &window;
 
         LogPrintf("Starting Gridcoin");
 
@@ -651,8 +656,8 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 UninterruptibleSleep(std::chrono::milliseconds{100});
             }
 
-            if (splashref)
-                splash.finish(&window);
+            // if (splashref)
+                // splash.finish(&window);
 
             if (!fRequestShutdown) {
                 // Put this in a block, so that the Model objects are cleaned up before
@@ -664,21 +669,31 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 MRCModel mrcModel(&walletModel, &clientModel, &researcherModel);
                 VotingModel votingModel(clientModel, optionsModel, walletModel);
 
-                window.setResearcherModel(&researcherModel);
-                window.setClientModel(&clientModel);
-                window.setWalletModel(&walletModel);
-                window.setMRCModel(&mrcModel);
-                window.setVotingModel(&votingModel);
+                QQmlApplicationEngine engine;
+                const QUrl url(QStringLiteral("qrc:/qml/Main.qml"));
+                QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+                                &app, [url](QObject *obj, const QUrl &objUrl){
+                    if (!obj && url == objUrl)
+                        QCoreApplication::exit(-1);
+                }, Qt::QueuedConnection);
 
+                engine.rootContext()->setContextProperty("_clientModel", &clientModel);
+                engine.rootContext()->setContextProperty("_walletModel", &walletModel);
+                engine.rootContext()->setContextProperty("_researcherModel", &researcherModel);
+                engine.rootContext()->setContextProperty("_mrcModel", &mrcModel);
+                engine.rootContext()->setContextProperty("_votingModel", &votingModel);
+                
+                engine.load(url);
+                
                 // If -min option passed, start window minimized.
-                if(gArgs.GetBoolArg("-min"))
-                {
-                    window.showMinimized();
-                }
-                else
-                {
-                    window.show();
-                }
+                // if(gArgs.GetBoolArg("-min"))
+                // {
+                //     window.showMinimized();
+                // }
+                // else
+                // {
+                //     window.show();
+                // }
 
                 // Place this here as guiref has to be defined if we don't want to lose URIs
                 ipcInit(argc, argv);
@@ -694,10 +709,10 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
                 app.exec();
 
-                window.hide();
-                window.setClientModel(nullptr);
-                window.setWalletModel(nullptr);
-                window.setResearcherModel(nullptr);
+                // window.hide();
+                // window.setClientModel(nullptr);
+                // window.setWalletModel(nullptr);
+                // window.setResearcherModel(nullptr);
                 guiref = nullptr;
             }
             // Shutdown the core and its threads, but don't exit Bitcoin-Qt here

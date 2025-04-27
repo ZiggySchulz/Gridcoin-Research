@@ -120,7 +120,7 @@ option(BUNDLED_OPENSSL  "Use the bundled version of OpenSSL" ${HUNTER_ENABLED})
 # ===================
 
 set(QT6_MINIMUM_VERSION 6.2.0)
-set(QT_COMPONENTS Core Gui LinguistTools Network Widgets)
+set(QT_COMPONENTS Core Gui LinguistTools Network Widgets Qml QuickControls2)
 if(USE_DBUS)
     list(APPEND QT_COMPONENTS DBus)
 endif()
