@@ -101,7 +101,6 @@ option(ENABLE_QRENCODE  "Enable generation of QR Codes for receiving payments" O
 option(ENABLE_UPNP      "Enable UPnP port mapping support" OFF)
 option(DEFAULT_UPNP     "Turn UPnP on startup" OFF)
 option(USE_DBUS         "Enable DBus support" OFF)
-option(USE_QT6          "Use Qt 6 instead of Qt 5" OFF)
 
 # Bundled packages
 option(SYSTEM_BDB       "Find system installation of Berkeley DB CXX 5.3" OFF)
@@ -115,19 +114,13 @@ option(BUNDLED_BOOST    "Use the bundled version of Boost" ${HUNTER_ENABLED})
 option(BUNDLED_CURL     "Use the bundled version of cURL" ${HUNTER_ENABLED})
 option(BUNDLED_LIBZIP   "Use the bundled version of libzip" ${HUNTER_ENABLED})
 option(BUNDLED_OPENSSL  "Use the bundled version of OpenSSL" ${HUNTER_ENABLED})
-option(BUNDLED_QT5      "Use the bundled version of Qt 5" ${HUNTER_ENABLED})
 
 
 # Handle dependencies
 # ===================
 
-set(QT5_MINIMUM_VERSION 5.9.5)
 set(QT6_MINIMUM_VERSION 6.2.0)
-set(QT_COMPONENTS Core Concurrent Gui LinguistTools Network Widgets)
-set(QT_HUNTER_COMPONENTS qtbase qttools)
-if(USE_QT6)
-    list(APPEND QT_COMPONENTS Core5Compat)
-endif()
+set(QT_COMPONENTS Core Gui LinguistTools Network Widgets)
 if(USE_DBUS)
     list(APPEND QT_COMPONENTS DBus)
 endif()
@@ -204,27 +197,8 @@ if(USE_ASM)
 endif()
 
 if(ENABLE_GUI)
-    if(USE_QT6)
-        find_package(Qt6 ${QT6_MINIMUM_VERSION} COMPONENTS ${QT_COMPONENTS} REQUIRED)
-        set(QT Qt6)
-    else()
-        if(BUNDLED_QT5)
-            hunter_add_package(Qt COMPONENTS ${QT_HUNTER_COMPONENTS})
-        endif()
-        find_package(Qt5 ${QT5_MINIMUM_VERSION} COMPONENTS ${QT_COMPONENTS} REQUIRED)
-        set(QT Qt5)
-
-        # Compatibility macros
-        if(Qt5Core_VERSION VERSION_LESS 5.15.0)
-            macro(qt_create_translation)
-                qt5_create_translation(${ARGN})
-            endmacro()
-
-            macro(qt_add_translation)
-                qt5_add_translation(${ARGN})
-            endmacro()
-        endif()
-    endif()
+    find_package(Qt6 ${QT6_MINIMUM_VERSION} COMPONENTS ${QT_COMPONENTS} REQUIRED)
+    set(QT Qt6)
 
     if(ENABLE_QRENCODE)
         pkg_check_modules(QRENCODE REQUIRED IMPORTED_TARGET libqrencode)

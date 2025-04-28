@@ -9,9 +9,9 @@
 #include "util.h"
 #include "util/threadnames.h"
 
-#include <QtConcurrentRun>
 #include <QSortFilterProxyModel>
 #include <QStringList>
+#include <QThreadPool>
 
 using namespace GRC;
 
@@ -265,7 +265,8 @@ void PollTableModel::refresh()
                  __func__);
     }
 
-    QtConcurrent::run([this]() {
+    QThreadPool *pool = QThreadPool::globalInstance();
+    pool->start([this]() {
         RenameThread("PollTableModel_refresh");
         util::ThreadSetInternalName("PollTableModel_refresh");
 
