@@ -183,13 +183,21 @@ add_dependencies(gridcoinqt gridcoinqt_l10n)
 # Application
 # ===========
 
-add_executable(gridcoinresearch WIN32 MACOSX_BUNDLE bitcoin.cpp)
+add_executable(gridcoinresearch bitcoin.cpp)
 
 target_link_libraries(gridcoinresearch PRIVATE
     ${RUNTIME_LIBS}
     ${QT}::Widgets
     gridcoin_util
     gridcoinqt
+)
+
+set_target_properties(gridcoinresearch PROPERTIES
+    MACOSX_BUNDLE_GUI_IDENTIFIER gridcoin.us
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
 )
 
 if(UNIX AND NOT APPLE)
