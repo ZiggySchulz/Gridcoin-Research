@@ -1,5 +1,3 @@
-add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
-
 # Translations
 # ============
 add_subdirectory(locale)
@@ -165,7 +163,7 @@ elseif(WIN32)
 endif()
 
 target_compile_definitions(gridcoinqt PUBLIC HAVE_CONFIG_H)
-target_compile_definitions(gridcoinqt PUBLIC QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
+target_compile_definitions(gridcoinqt PUBLIC QT_DISABLE_DEPRECATED_UP_TO=0x060200)
 
 if(ENABLE_UPNP)
     if(DEFAULT_UPNP)
