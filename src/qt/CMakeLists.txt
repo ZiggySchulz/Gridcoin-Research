@@ -95,6 +95,7 @@ add_library(gridcoinqt STATIC
     voting/votingpage.cpp
     walletmodel.cpp
     winshutdownmonitor.cpp
+    cppqmlmessagebridge.h cppqmlmessagebridge.cpp
 
     bitcoin.qrc
     bitcoin_locale.qrc
@@ -114,6 +115,7 @@ elseif(APPLE)
     )
 endif()
 
+set(CMAKE_AUTOMOC ON)
 set_target_properties(gridcoinqt PROPERTIES
     AUTOMOC ON
     AUTORCC ON
@@ -138,10 +140,31 @@ set_source_files_properties(
         SKIP_AUTOUIC ON
 )
 
+qt_policy(SET QTP0004 NEW)
+qt_add_qml_module(MMPTheme
+    URI MMPTheme
+    VERSION 1.0
+    RESOURCE_PREFIX qml
+    OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/MMPTheme"
+    RESOURCES
+        qml/MMPTheme/qmldir
+    QML_FILES  
+        qml/MMPTheme/MMPTheme.qml
+        qml/MMPTheme/Button.qml
+        qml/MMPTheme/CheckBox.qml
+        qml/MMPTheme/GroupBox.qml
+        qml/MMPTheme/RadioButton.qml
+        qml/MMPTheme/ScrollBar.qml
+        qml/MMPTheme/SpinBox.qml
+        qml/MMPTheme/TextArea.qml
+        qml/MMPTheme/TextField.qml
+)
+
 # Libraries to link
 # =================
 
 target_link_libraries(gridcoinqt PUBLIC
+    MMPTheme
     ${QT}::Core
     ${QT}::Gui
     ${QT}::Network

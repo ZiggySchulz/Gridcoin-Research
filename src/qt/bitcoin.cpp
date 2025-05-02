@@ -31,6 +31,7 @@
 #include "upgradeqt.h"
 #include "validation.h"
 #include "decoration.h"
+#include "cppqmlmessagebridge.h"
 
 #include <stdexcept>
 
@@ -79,6 +80,7 @@ extern bool bGridcoinCoreInitComplete;
 // Need a global reference for the notifications to find the GUI
 static BitcoinGUI *guiref;
 static QSplashScreen *splashref;
+static CppQmlMessageBridge *messageref;
 
 static void RegisterMetaTypes()
 {
@@ -185,12 +187,9 @@ static void ThreadSafeHandleURI(const std::string& strURI)
 
 static void InitMessage(const std::string &message)
 {
-    if(splashref)
+    if(messageref)
     {
-        QMetaObject::invokeMethod(splashref, "showMessage",
-                                  Qt::QueuedConnection,
-                                  Q_ARG(QString, QString::fromStdString(message)),
-                                  Q_ARG(int, Qt::AlignBottom|Qt::AlignHCenter));
+        messageref->postInitMessage(QString::fromStdString(message));
     }
 }
 
@@ -360,7 +359,6 @@ int main(int argc, char *argv[])
     //
     if (!gArgs.IsArgSet("-style")) {
         app.setStyle("Fusion");
-        QQuickStyle::setStyle("Fusion");
     }
 #endif
 
@@ -606,6 +604,9 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
     // Install qDebug() message handler to route to debug.log
     qInstallMessageHandler(DebugMessageHandler);
+    
+    CppQmlMessageBridge messageBrige;
+    messageref = &messageBrige;
 
     // Subscribe to global signals from core
     uiInterface.ThreadSafeMessageBox_connect(ThreadSafeMessageBox);
@@ -619,12 +620,37 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
     uiInterface.UpdateMessageBox_connect(UpdateMessageBox);
 
-    QSplashScreen splash(QPixmap(":/images/splash"));
+    QQmlApplicationEngine engine;
+    engine.addImportPath("qrc:/qml");
+
+    const QUrl url(QStringLiteral("qrc:/qml/Main.qml"));
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+                    &app, [url](QObject *obj, const QUrl &objUrl){
+        if (!obj && url == objUrl)
+            QCoreApplication::exit(-1);
+    }, Qt::QueuedConnection);
+
+    QObject::connect(&engine, &QQmlEngine::warnings, [](const QList<QQmlError> &warnings) {
+        qWarning() << "QML Warnings:";
+        for (const QQmlError &error : warnings) {
+            qWarning() << error.toString();
+        }
+    });
+
+    engine.rootContext()->setContextProperty("_messageBrige", &messageBrige);
+    
+    engine.load(url);
+    if (engine.rootObjects().isEmpty()) {
+        qCritical() << "Error: No root object found after loading QML.  Check for errors during loading.";
+        return -1; // Return an error code
+    }
+    
+    // QSplashScreen splash(QPixmap(":/images/splash"));
     if (gArgs.GetBoolArg("-splash", true) && !gArgs.GetBoolArg("-min"))
     {
-        splash.setEnabled(false);
-        splash.show();
-        splashref = &splash;
+        // splash.setEnabled(false);
+        // splash.show();
+        // splashref = &splash;
     }
 
     app.processEvents();
@@ -669,13 +695,6 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 MRCModel mrcModel(&walletModel, &clientModel, &researcherModel);
                 VotingModel votingModel(clientModel, optionsModel, walletModel);
 
-                QQmlApplicationEngine engine;
-                const QUrl url(QStringLiteral("qrc:/qml/Main.qml"));
-                QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                                &app, [url](QObject *obj, const QUrl &objUrl){
-                    if (!obj && url == objUrl)
-                        QCoreApplication::exit(-1);
-                }, Qt::QueuedConnection);
 
                 engine.rootContext()->setContextProperty("_clientModel", &clientModel);
                 engine.rootContext()->setContextProperty("_walletModel", &walletModel);
