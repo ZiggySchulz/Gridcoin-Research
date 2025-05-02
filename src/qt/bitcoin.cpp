@@ -31,7 +31,7 @@
 #include "upgradeqt.h"
 #include "validation.h"
 #include "decoration.h"
-#include "cppqmlmessagebridge.h"
+#include "initializationmodel.h"
 
 #include <stdexcept>
 
@@ -81,7 +81,7 @@ extern bool bGridcoinCoreInitComplete;
 // Need a global reference for the notifications to find the GUI
 static BitcoinGUI *guiref;
 static QSplashScreen *splashref;
-static CppQmlMessageBridge *messageref;
+static InitializationModel *initRef;
 
 static void RegisterMetaTypes()
 {
@@ -188,9 +188,16 @@ static void ThreadSafeHandleURI(const std::string& strURI)
 
 static void InitMessage(const std::string &message)
 {
-    if(messageref)
+    if(initRef)
     {
-        messageref->postInitMessage(QString::fromStdString(message));
+        initRef->setMessage(QString::fromStdString(message));
+    }
+}
+
+static void InitProgress(unsigned int loaded, unsigned int total)
+{
+    if(initRef) {
+        initRef->setLoadandTotal(loaded, total);
     }
 }
 
@@ -606,8 +613,8 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
     // Install qDebug() message handler to route to debug.log
     qInstallMessageHandler(DebugMessageHandler);
     
-    CppQmlMessageBridge messageBrige;
-    messageref = &messageBrige;
+    InitializationModel initModel;
+    initRef = &initModel;
 
     // Subscribe to global signals from core
     uiInterface.ThreadSafeMessageBox_connect(ThreadSafeMessageBox);
@@ -616,6 +623,7 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
     uiInterface.ThreadSafeHandleURI_connect(ThreadSafeHandleURI);
     uiInterface.InitMessage_connect(InitMessage);
+    uiInterface.InitProgress_connect(InitProgress);
     uiInterface.QueueShutdown_connect(QueueShutdown);
     uiInterface.Translate_connect(Translate);
 
@@ -642,7 +650,7 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
         }
     });
 
-    engine.rootContext()->setContextProperty("_messageBrige", &messageBrige);
+    engine.rootContext()->setContextProperty("_initModel", &initModel);
     
     engine.load(url);
     
