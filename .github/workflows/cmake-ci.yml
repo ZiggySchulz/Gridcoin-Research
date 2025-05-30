@@ -214,6 +214,7 @@ jobs:
                           qrencode:p
                           qt6-base:p
                           qt6-tools:p
+                          qt6-declarative:p
                       options: >-
                           -DENABLE_GUI=ON
                           -DENABLE_QRENCODE=ON
