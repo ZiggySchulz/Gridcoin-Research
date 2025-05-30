@@ -231,8 +231,9 @@ jobs:
                       deps: >-
                           miniupnpc:p
                           qrencode:p
-                          qt5-base:p
-                          qt5-tools:p
+                          qt6-base:p
+                          qt6-tools:p
+                          qt6-declarative:p
                       options: >-
                           -DENABLE_GUI=ON
                           -DENABLE_QRENCODE=ON
