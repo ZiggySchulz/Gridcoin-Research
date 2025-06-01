@@ -478,7 +478,6 @@ bool CTxDB::LoadBlockIndex()
                 if (nLoaded > nHighest) nHighest=nLoaded;
                 if (nHighest < nGrandfather) nHighest=nGrandfather;
                 uiInterface.InitMessage(strprintf("%" PRId64 "/%" PRId64 " %s", nLoaded, nHighest, _("Blocks Verified")));
-                uiInterface.InitProgress(nLoaded, nHighest);
             }
         }
 
