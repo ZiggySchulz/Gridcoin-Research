@@ -9,6 +9,7 @@
 #include "amount.h"
 #include <QObject>
 #include <optional>
+#include "gridcoin/researcher.h"
 
 QT_BEGIN_NAMESPACE
 class QIcon;
@@ -18,9 +19,12 @@ class ResearcherWizard;
 class WalletModel;
 
 namespace GRC {
+Q_NAMESPACE
+
 class Beacon;
 class Researcher;
 
+Q_ENUM_NS(ResearcherMode)
 //!
 //! \brief A smart pointer around the global BOINC researcher context.
 //!
@@ -98,6 +102,7 @@ class ResearcherModel : public QObject
     Q_PROPERTY(QString timeToPendingBeaconExpiration READ formatTimeToPendingBeaconExpiration NOTIFY beaconChanged)
     Q_PROPERTY(QString beaconAddress READ formatBeaconAddress NOTIFY beaconChanged)
     Q_PROPERTY(QString beaconVerificationCode READ formatBeaconVerificationCode NOTIFY beaconChanged)
+    Q_PROPERTY(GRC::ResearcherMode researcherMode READ getResearcherMode NOTIFY researcherChanged)
 
     Q_ENUM(BeaconStatus)
     
@@ -151,6 +156,7 @@ public:
     QString formatTimeToPendingBeaconExpiration() const;
     QString formatBeaconAddress() const;
     QString formatBeaconVerificationCode() const;
+    GRC::ResearcherMode getResearcherMode() const;
 
     std::vector<ProjectRow> buildProjectTable(bool extended = true) const;
 
