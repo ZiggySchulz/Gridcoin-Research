@@ -187,6 +187,8 @@ target_link_libraries(gridcoinqt PUBLIC
     ${QT}::Gui
     ${QT}::Network
     ${QT}::Widgets
+    ${QT}::Qml
+    ${QT}::QuickControls2
     gridcoin_util
 )
 
@@ -226,10 +228,10 @@ add_dependencies(gridcoinqt gridcoinqt_l10n)
 
 add_executable(gridcoinresearch bitcoin.cpp)
 
-set(MACOSX_BUNDLE_RESOURCE_FILES res/icons/gridcoin.icns)
-if(APPLE)
-    target_sources(gridcoinresearch PRIVATE ${MACOSX_BUNDLE_RESOURCE_FILES})
-endif()
+# set(MACOSX_BUNDLE_RESOURCE_FILES res/icons/gridcoin.icns)
+# if(APPLE)
+#     target_sources(gridcoinresearch PRIVATE ${MACOSX_BUNDLE_RESOURCE_FILES})
+# endif()
 
 target_link_libraries(gridcoinresearch PRIVATE
     ${RUNTIME_LIBS}
@@ -240,9 +242,13 @@ target_link_libraries(gridcoinresearch PRIVATE
 
 set_target_properties(gridcoinresearch PROPERTIES
     WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE_GUI_IDENTIFIER gridcoin.us
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE_BUNDLE_NAME "Gridcoin Wallet"
     MACOSX_BUNDLE TRUE
-    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/share/qt/Info.plist.cmake.in"
-    RESOURCE ${MACOSX_BUNDLE_RESOURCE_FILES}
+    # MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/share/qt/Info.plist.cmake.in"
+    # RESOURCE ${MACOSX_BUNDLE_RESOURCE_FILES}
 )
 
 if(UNIX AND NOT APPLE)
