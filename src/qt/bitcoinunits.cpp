@@ -216,7 +216,7 @@ double BitcoinUnits::halfordsToGrc(CAmount halfords) {
 }
 
 CAmount BitcoinUnits::GrcToHalfords(const QString &grc) {
-    CAmount out;
+    qint64 out;
     parse(BTC, grc, &out);
     return out;
 }
