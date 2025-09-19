@@ -48,7 +48,7 @@ SendCoinsDialog::SendCoinsDialog(QWidget* parent)
     connect(ui->coinControlPushButton, &QPushButton::clicked, this, &SendCoinsDialog::coinControlButtonClicked);
     connect(ui->coinControlConsolidateWizardPushButton, &QPushButton::clicked, this, &SendCoinsDialog::coinControlConsolidateWizardButtonClicked);
     connect(ui->coinControlResetPushButton, &QPushButton::clicked, this, &SendCoinsDialog::coinControlResetButtonClicked);
-    connect(ui->coinControlChangeCheckBox, &QCheckBox::checkStateChanged, this, &SendCoinsDialog::coinControlChangeChecked);
+    connect(ui->coinControlChangeCheckBox, &QCheckBox::stateChanged, this, &SendCoinsDialog::coinControlChangeChecked);
     connect(ui->coinControlChangeEdit, &QLineEdit::textEdited, this, &SendCoinsDialog::coinControlChangeEdited);
 
     // Coin Control: clipboard actions
