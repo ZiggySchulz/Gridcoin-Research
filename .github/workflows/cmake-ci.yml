@@ -43,7 +43,6 @@ jobs:
                       options: >-
                           -DENABLE_GUI=ON
                           -DUSE_DBUS=ON
-                          -DUSE_QT6=ON
                     - tag: system-libs
                       deps: >-
                           libdb5.3++-dev
@@ -146,7 +145,6 @@ jobs:
                       options: >-
                           -DENABLE_GUI=ON
                           -DQt6_DIR=$(brew --prefix qt@6)/lib/cmake/Qt6
-                          -DUSE_QT6=ON
                     - tag: system-libs
                       deps: >-
                           berkeley-db@5
@@ -246,7 +244,6 @@ jobs:
                           qt6-tools:p
                       options: >-
                           -DENABLE_GUI=ON
-                          -DUSE_QT6=ON
         steps:
             - name: Checkout
               uses: actions/checkout@v4
