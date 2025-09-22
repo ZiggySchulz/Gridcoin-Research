@@ -123,10 +123,9 @@ jobs:
                       deps: >-
                           miniupnpc
                           qrencode
-                          qt@5
+                          qt
                       options: >-
                           -DENABLE_GUI=ON
-                          -DQt5_DIR=$(brew --prefix qt@5)/lib/cmake/Qt5
                           -DENABLE_QRENCODE=ON
                           -DENABLE_UPNP=ON
                     - tag: system-libs
