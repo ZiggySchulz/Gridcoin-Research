@@ -344,7 +344,7 @@ QFuture<WalletModel::SendCoinsReturn> WalletModel::sendCoins(const QList<SendCoi
                         }
                         if (nAmount <= 0)
                         {
-                            promise.addResult({FeeExceedsSubtractedAmount, nFeeRequired});
+                            promise.addResult(SendCoinsReturn(FeeExceedsSubtractedAmount, nFeeRequired));
                             promise.finish();
                             return promise.future();
                         }
