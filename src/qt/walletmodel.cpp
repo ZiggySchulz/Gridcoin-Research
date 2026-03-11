@@ -299,8 +299,6 @@ QFuture<WalletModel::SendCoinsReturn> WalletModel::sendCoins(const QList<SendCoi
             vecSend.push_back(std::make_pair(scriptPubKey, rcp.amount));
         }
 
-        CReserveKey keyChange(wallet);
-        int64_t nFeeRequired = 0;
         bool fCreated = wallet->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, coinControl);
 
         // If any recipient has "subtract fee from amount" enabled, rebuild the
