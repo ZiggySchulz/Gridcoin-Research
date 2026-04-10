@@ -12,6 +12,7 @@
 
 class OptionsModel;
 class AddressTableModel;
+class AddressFilterProxyModel;
 class TransactionTableModel;
 class CWallet;
 class CKeyID;
@@ -47,6 +48,8 @@ class WalletModel : public QObject
     Q_PROPERTY(EncryptionStatus encryptionStatus READ getEncryptionStatus NOTIFY encryptionStatusChanged);
 
     Q_PROPERTY(TransactionTableModel* transactionTableModel READ getTransactionTableModel CONSTANT)
+    Q_PROPERTY(AddressTableModel* addressTableModel READ getAddressTableModel CONSTANT)
+    Q_PROPERTY(AddressFilterProxyModel* receiveAddressTableModel READ getReceiveAddressTableModel CONSTANT)
 
 public:
     explicit WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent = nullptr);
@@ -76,6 +79,7 @@ public:
 
     OptionsModel *getOptionsModel();
     AddressTableModel *getAddressTableModel();
+    AddressFilterProxyModel *getReceiveAddressTableModel();
     TransactionTableModel *getTransactionTableModel();
 
     double getBalance() const;
@@ -152,6 +156,7 @@ private:
     OptionsModel *optionsModel;
 
     AddressTableModel *addressTableModel;
+    AddressFilterProxyModel *receiveAddressTableModel;
     TransactionTableModel *transactionTableModel;
 
     // Cache some values to be able to detect changes

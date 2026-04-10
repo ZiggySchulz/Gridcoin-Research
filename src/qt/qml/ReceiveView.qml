@@ -79,8 +79,9 @@ Rectangle {
         }
 
         SearchBox {
+            id: searchBox
             placeholderText: qsTr("Search by label or address")
-            //onTextChanged: listview.sortModel(text)
+            onTextChanged: _walletModel.receiveAddressTableModel.filterString = text
             anchors {
                 verticalCenter: parent.verticalCenter
                 right: parent.right
@@ -89,50 +90,11 @@ Rectangle {
         }
     }
     Rectangle {
-        id: mrcPanel
-        color: MMPTheme.bodyColor
-        radius: 4
-        height: mrcRowLayout.implicitHeight + 20
-        anchors {
-            top: header.bottom
-            left: parent.left
-            right: parent.right
-            margins: 10
-        }
-        RowLayout {
-            id: mrcRowLayout
-            anchors {
-                top: parent.top
-                topMargin: 10
-                horizontalCenter: parent.horizontalCenter
-            }
-            Text {
-                id: mrcRewardsText
-                text: "583"
-                color: MMPTheme.highlightColor
-                font.weight: Font.DemiBold
-            }
-            Text {
-                id: mrcRewardsLabel
-                text: qsTr("research rewards to be claimed: ")
-                color: MMPTheme.textColor
-            }
-            Button {
-                id: mrcClaimButton
-                text: qsTr("Claim Research Rewards")
-                icon.source: MMPTheme.themeSelect("qrc:/icons/buttons/ic_btn_mrc_light.svg", "qrc:/icons/buttons/ic_btn_mrc_dark.svg")
-            }
-            HelpHover {
-                text: qsTr("Make a claim to receive your rewards. The fees are: ....")
-            }
-        }
-    }
-    Rectangle {
         id: receivePanel
         color: MMPTheme.bodyColor
         radius: 4
         anchors {
-            top: mrcPanel.bottom
+            top: header.bottom
             left: parent.left
             right: parent.right
             bottom: parent.bottom
@@ -155,8 +117,7 @@ Rectangle {
         }
         Rectangle {
             id: addressListRect
-            property int labelColumnWidth: width-lastUsedColumnWidth-addressColumnWidth
-            property int lastUsedColumnWidth: Math.max(90, width*0.15)
+            property int labelColumnWidth: width-addressColumnWidth
             property int addressColumnWidth: Math.max(300, width*0.45)
             color: MMPTheme.themeSelect(MMPTheme.cWhite, "#17222c")
             border.color: MMPTheme.lightBorderColor
@@ -181,7 +142,6 @@ Rectangle {
                 radius: parent.radius
                 model: [
                     { text: qsTr("Label"), width: addressListRect.labelColumnWidth },
-                    { text: qsTr("Last Used"), width: addressListRect.lastUsedColumnWidth },
                     { text: qsTr("Address"), width: addressListRect.addressColumnWidth }
                 ]
             }
@@ -207,21 +167,9 @@ Rectangle {
                     rightMargin: 1
                 }
 
-                model: ListModel {
-                    id: addressListModel
-                    ListElement {
-                        label: "Donation"
-                        lastUsed: 1609723156
-                        address: "SBPvphumk9BmzdLqCBy4b7U62tj39iynLo"
-                    }
-                    ListElement {
-                        label: "Inbox"
-                        lastUsed: 1605743156
-                        address: "SGMMMMMMMMMMMMMMMMMMMMMMMMMMMMfqtz"
-                    }
-                }
+                model: _walletModel.receiveAddressTableModel
                 delegate: MouseArea {
-                    width: parent.width
+                    width: ListView.view.width
                     height: 25
                     onClicked: addressListView.currentIndex=index
                     Rectangle {
@@ -234,7 +182,7 @@ Rectangle {
                             Text {
                                 id: labelText
                                 height: parent.height
-                                text: label
+                                text: model.label === "" ? qsTr("(no label)") : model.label
                                 color: MMPTheme.translucent(MMPTheme.textColor, addressListView.currentIndex===index ? 1 : 0.7)
                                 verticalAlignment: Text.AlignVCenter
                                 elide: Text.ElideRight
@@ -244,32 +192,15 @@ Rectangle {
                                 }
                             }
                         }
-                        Item {
-                            id: lastUsedTextItem
-                            height: parent.height
-                            width: addressListRect.lastUsedColumnWidth
-                            anchors.left: labelTextItem.right
-                            Text {
-                                id: lastUsedText
-                                height: parent.height
-                                text: (new Date(lastUsed*1000)).toLocaleDateString(Qt.locale(), "d MMM yyyy")
-                                color: MMPTheme.translucent(MMPTheme.textColor, addressListView.currentIndex===index ? 1 : 0.7)
-                                verticalAlignment: Text.AlignVCenter
-                                anchors {
-                                    left: parent.left
-                                    leftMargin: 10
-                                }
-                            }
-                        }
                         Text {
                             id: addressText
                             height: parent.height
-                            text: address
+                            text: model.address
                             color: MMPTheme.translucent(MMPTheme.textColor, addressListView.currentIndex===index ? 1 : 0.7)
                             verticalAlignment: Text.AlignVCenter
                             elide: Text.ElideRight
                             anchors {
-                                left: lastUsedTextItem.right
+                                left: labelTextItem.right
                                 leftMargin: 10
                                 right: copyButton.visible ? copyButton.left : parent.right
                                 rightMargin: 1
@@ -286,6 +217,17 @@ Rectangle {
                                 rightMargin: 2
                             }
                             background: Item {}
+                            onClicked: {
+                                copyTextEdit.text = model.address
+                                copyTextEdit.selectAll()
+                                copyTextEdit.copy()
+                            }
+                            TextEdit {
+                                id: copyTextEdit
+                                text: model.address
+                                readOnly: true
+                                visible: false
+                            }
                         }
                     }
                 }
@@ -304,6 +246,7 @@ Rectangle {
                         implicitWidth: 30
                         icon.source: MMPTheme.themeSelect("qrc:/icons/generic/ic_add_light.svg","qrc:/icons/generic/ic_add_dark.svg")
                         background: Item{}
+                        onClicked: _walletModel.addressTableModel.addRow("R", "", "")
                     }
                     Rectangle {
                         id: buttonSeparator

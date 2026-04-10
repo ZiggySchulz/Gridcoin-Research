@@ -32,6 +32,10 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
          , cachedNumBlocks(0)
 {
     addressTableModel = new AddressTableModel(wallet, this);
+    receiveAddressTableModel = new AddressFilterProxyModel(this);
+    receiveAddressTableModel->setSourceModel(addressTableModel);
+    receiveAddressTableModel->setTypeFilter(AddressTableModel::Receive);
+
     transactionTableModel = new TransactionTableModel(wallet, this);
 
     // This timer will be fired repeatedly to update the balance
@@ -422,6 +426,11 @@ OptionsModel *WalletModel::getOptionsModel()
 AddressTableModel *WalletModel::getAddressTableModel()
 {
     return addressTableModel;
+}
+
+AddressFilterProxyModel *WalletModel::getReceiveAddressTableModel()
+{
+    return receiveAddressTableModel;
 }
 
 TransactionTableModel *WalletModel::getTransactionTableModel()

@@ -13,7 +13,7 @@ Rectangle {
     color:  MMPTheme.themeSelect(MMPTheme.cViolentViolet, MMPTheme.cSpaceBlack)
 
     Shortcut {
-        sequence: StandardKey.Preferences
+        sequences: [StandardKey.Preferences]
         onActivated: {
             menuList.currentIndex = 6
             backgroundRect.menuButtonClicked("SettingsView.qml")

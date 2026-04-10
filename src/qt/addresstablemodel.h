@@ -2,6 +2,7 @@
 #define BITCOIN_QT_ADDRESSTABLEMODEL_H
 
 #include <QAbstractTableModel>
+#include <QSortFilterProxyModel>
 #include <QStringList>
 
 #include "wallet/ismine.h"
@@ -28,7 +29,9 @@ public:
     static constexpr std::initializer_list<ColumnIndex> all_ColumnIndex = {Label, Address};
 
     enum RoleIndex {
-        TypeRole = Qt::UserRole /**< Type of address (#Send or #Receive) */
+        TypeRole = Qt::UserRole, /**< Type of address (#Send or #Receive) */
+        LabelRole,               /**< User specified label */
+        AddressRole              /**< Bitcoin address */
     };
 
     /** Return status of edit/insert operation */
@@ -41,6 +44,7 @@ public:
         KEY_GENERATION_FAILURE, /**< Generating a new public key for a receiving address failed */
         NOT_MINE                /**< Address is not owned by this wallet */
     };
+    Q_ENUM(EditStatus)
 
     static const QString Send;              /**< Specifies send address */
     static const QString Receive;           /**< Specifies receive address */
@@ -48,20 +52,16 @@ public:
 
     /** @name Methods overridden from QAbstractTableModel
         @{*/
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    int rowCount(const QModelIndex &parent) const override;
+    int columnCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    QHash<int, QByteArray> roleNames() const override;
     /*@}*/
-
-    /* Add an address to the model.
-       Returns the added address on success, and an empty string otherwise.
-     */
-    QString addRow(const QString &type, const QString &label, const QString &address);
 
     /* Return list of owned addresses not yet in the address book.
      */
@@ -95,8 +95,39 @@ public slots:
     /* Update address list from core.
      */
     void updateEntry(const QString &address, const QString &label, bool isMine, int status);
+    /* Add an address to the model.
+       Returns the added address on success, and an empty string otherwise.
+     */
+    QString addRow(const QString &type, const QString &label, const QString &address);
 
     friend class AddressTablePriv;
+};
+
+class AddressFilterProxyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QString filterString READ filterString WRITE setFilterString NOTIFY filterStringChanged)
+    Q_PROPERTY(QString typeFilter READ typeFilter WRITE setTypeFilter NOTIFY typeFilterChanged)
+
+public:
+    explicit AddressFilterProxyModel(QObject* parent = nullptr);
+
+    QString filterString() const { return m_filterString; }
+    void setFilterString(const QString& filter);
+
+    QString typeFilter() const { return m_typeFilter; }
+    void setTypeFilter(const QString& filter);
+
+protected:
+    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
+
+signals:
+    void filterStringChanged();
+    void typeFilterChanged();
+
+private:
+    QString m_filterString;
+    QString m_typeFilter;
 };
 
 #endif // BITCOIN_QT_ADDRESSTABLEMODEL_H
