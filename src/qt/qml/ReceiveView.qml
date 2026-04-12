@@ -9,6 +9,14 @@ import MMPTheme 1.0
 Rectangle {
     id: main
     color: MMPTheme.backgroundColor
+
+    Connections {
+        target: _walletModel.addressTableModel
+        function onEditAddressFailed(message) {
+            _nativeDialog.warning(qsTr("Address Error"), message)
+        }
+    }
+
     Rectangle {
         id: header
         color: MMPTheme.headerColor
@@ -262,7 +270,6 @@ Rectangle {
             height: 40
             width: parent.width
             anchors.bottom: parent.bottom
-            //Background
             Rectangle {
                 id: bottomCurvedRect
                 color: MMPTheme.secondaryBodyColor

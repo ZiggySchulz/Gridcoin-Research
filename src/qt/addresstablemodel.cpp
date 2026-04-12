@@ -335,7 +335,7 @@ void AddressTableModel::updateEntry(const QString &address, const QString &label
     priv->updateEntry(address, label, isMine, status);
 }
 
-QString AddressTableModel::addRow(const QString &type, const QString &label, const QString &address)
+void AddressTableModel::addRow(const QString &type, const QString &label, const QString &address)
 {
     std::string strLabel = label.toStdString();
     std::string strAddress = address.toStdString();
@@ -346,61 +346,61 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
     {
         if(!walletModel->validateAddress(address))
         {
-            editStatus = INVALID_ADDRESS;
-            return QString();
+            emit editAddressFailed(tr("The entered address \"%1\" is not a valid address.").arg(address));
         }
         // Check for duplicate addresses
         {
             LOCK(wallet->cs_wallet);
             if(wallet->mapAddressBook.count(DecodeDestination(strAddress)))
             {
-                editStatus = DUPLICATE_ADDRESS;
-                return QString();
+                emit editAddressFailed(tr("The entered address \"%1\" is already in the address book.").arg(address));
+                return;
             }
         }
     }
     else if(type == Receive)
     {
         // Generate a new address to associate with given label
-        QFuture<WalletModel::UnlockContext> unlockFuture = walletModel->requestUnlock();
-        WalletModel::UnlockContext ctx = unlockFuture.result();
-        if(!ctx.isValid())
-        {
-            // Unlock wallet failed or was cancelled
-            editStatus = WALLET_UNLOCK_FAILURE;
-            return QString();
-        }
-        CPubKey newKey;
-        if(!wallet->GetKeyFromPool(newKey, true))
-        {
-            editStatus = KEY_GENERATION_FAILURE;
-            return QString();
-        }
-        strAddress = EncodeDestination(newKey.GetID());
+        walletModel->requestUnlock().then([this, strLabel](WalletModel::UnlockContext ctx) {
+            if(!ctx.isValid())
+            {
+                // Unlock wallet failed or was cancelled
+                emit editAddressFailed(tr("Wallet unlock was cancelled."));
+                return;
+            }
+            CPubKey newKey;
+            if(!wallet->GetKeyFromPool(newKey, true))
+            {
+                emit editAddressFailed(tr("New key generation failed."));
+                return;
+            }
+            std::string strNewAddress = EncodeDestination(newKey.GetID());
+            {
+                LOCK(wallet->cs_wallet);
+                wallet->SetAddressBookName(DecodeDestination(strNewAddress), strLabel);
+            }
+        });
+        return;
     }
     else if(type == ReceiveExisting)
     {
         if(!walletModel->validateAddress(address))
         {
-            editStatus = INVALID_ADDRESS;
-            return QString();
+            emit editAddressFailed(tr("The entered address \"%1\" is not a valid address.").arg(address));
+            return;
         }
         LOCK(wallet->cs_wallet);
         CTxDestination dest = DecodeDestination(strAddress);
         if(IsMine(*wallet, dest) == ISMINE_NO)
         {
-            editStatus = NOT_MINE;
-            return QString();
+            emit editAddressFailed(tr("The entered address \"%1\" is not owned by this wallet.").arg(address));
+            return;
         }
         if(wallet->mapAddressBook.count(dest))
         {
-            editStatus = DUPLICATE_ADDRESS;
-            return QString();
+            emit editAddressFailed(tr("The entered address \"%1\" is already in the address book.").arg(address));
+            return;
         }
-    }
-    else
-    {
-        return QString();
     }
 
     // Add entry
@@ -408,7 +408,6 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
         LOCK(wallet->cs_wallet);
         wallet->SetAddressBookName(DecodeDestination(strAddress), strLabel);
     }
-    return QString::fromStdString(strAddress);
 }
 
 bool AddressTableModel::removeRows(int row, int count, const QModelIndex &parent)

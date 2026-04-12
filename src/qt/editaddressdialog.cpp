@@ -87,16 +87,16 @@ bool EditAddressDialog::saveCurrentRow()
     {
     case NewReceivingAddress:
     case NewSendingAddress:
-        address = model->addRow(
-                mode == NewSendingAddress ? AddressTableModel::Send : AddressTableModel::Receive,
-                ui->labelEdit->text(),
-                ui->addressEdit->text());
+        // address = model->addRow(
+        //         mode == NewSendingAddress ? AddressTableModel::Send : AddressTableModel::Receive,
+        //         ui->labelEdit->text(),
+        //         ui->addressEdit->text());
         break;
     case AddExistingReceivingAddress:
-        address = model->addRow(
-                AddressTableModel::ReceiveExisting,
-                ui->labelEdit->text(),
-                addressCombo ? addressCombo->currentText() : QString());
+        // address = model->addRow(
+        //         AddressTableModel::ReceiveExisting,
+        //         ui->labelEdit->text(),
+        //         addressCombo ? addressCombo->currentText() : QString());
         break;
     case EditReceivingAddress:
     case EditSendingAddress:

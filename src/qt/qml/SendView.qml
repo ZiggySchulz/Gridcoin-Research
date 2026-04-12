@@ -3,7 +3,6 @@
 */
 import QtQuick
 import QtQuick.Controls
-import Qt.labs.platform // For MessageDialog. Can be removed Qt 6.3+
 import MMPTheme 1.0
 
 Rectangle {
@@ -13,14 +12,8 @@ Rectangle {
     Connections {
         target: _sendCoinsController
         function onCoinsSentOrFailed(message) {
-            coinsResultDialog.text = message
-            coinsResultDialog.open()
+            _nativeDialog.information(qsTr("Send Coins"), message)
         }
-    }
-
-    MessageDialog { 
-        id: coinsResultDialog
-        buttons: MessageDialog.Ok
     }
 
     Rectangle {
@@ -333,13 +326,6 @@ Rectangle {
     }
     
 
-    MessageDialog { 
-        id: messageDialog
-        title: qsTr("Are you sure?")
-        text: qsTr("Are you sure you want to send this transaction?")
-        buttons: MessageDialog.Ok | MessageDialog.Cancel
-        onOkClicked: _sendCoinsController.sendCoins()
-    }
 
     Rectangle {
         id: bottomControls
@@ -378,7 +364,11 @@ Rectangle {
             id: sendButton
             icon.source: MMPTheme.themeSelect("qrc:/icons/buttons/ic_btn_send_light.svg","qrc:/icons/buttons/ic_btn_send_dark.svg")
             text: qsTr("Send")
-            onClicked: messageDialog.open()
+            onClicked: {
+                if (_nativeDialog.question(qsTr("Are you sure?"), qsTr("Are you sure you want to send this transaction?"))) {
+                    _sendCoinsController.sendCoins()
+                }
+            }
             anchors {
                 verticalCenter: parent.verticalCenter
                 right: parent.right

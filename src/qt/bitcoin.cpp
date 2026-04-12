@@ -33,6 +33,7 @@
 #include "decoration.h"
 #include "initializationmodel.h"
 #include "sendcoinscontroller.h"
+#include "nativedialoghelper.h"
 
 #include <stdexcept>
 
@@ -707,6 +708,7 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 MRCModel mrcModel(&walletModel, &clientModel, &researcherModel);
                 VotingModel votingModel(clientModel, optionsModel, walletModel);
                 SendCoinsController sendCoinsController(walletModel);
+                NativeDialogHelper nativeDialogHelper;
 
                 engine->rootContext()->setContextProperty("_clientModel", &clientModel);
                 engine->rootContext()->setContextProperty("_walletModel", &walletModel);
@@ -714,6 +716,7 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 engine->rootContext()->setContextProperty("_mrcModel", &mrcModel);
                 engine->rootContext()->setContextProperty("_votingModel", &votingModel);
                 engine->rootContext()->setContextProperty("_sendCoinsController", &sendCoinsController);
+                engine->rootContext()->setContextProperty("_nativeDialog", &nativeDialogHelper);
 
                 initModel.setDoneLoading(true);
 

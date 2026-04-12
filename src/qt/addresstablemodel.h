@@ -90,15 +90,15 @@ private:
 
 signals:
     void defaultAddressChanged(const QString &address);
+    void editAddressFailed(const QString &message);
 
 public slots:
     /* Update address list from core.
      */
     void updateEntry(const QString &address, const QString &label, bool isMine, int status);
     /* Add an address to the model.
-       Returns the added address on success, and an empty string otherwise.
      */
-    QString addRow(const QString &type, const QString &label, const QString &address);
+    void addRow(const QString &type, const QString &label, const QString &address);
 
     friend class AddressTablePriv;
 };

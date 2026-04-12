@@ -117,6 +117,7 @@ add_library(gridcoinqt STATIC
     winshutdownmonitor.cpp
     initializationmodel.cpp
     sendcoinscontroller.cpp
+    nativedialoghelper.cpp
 
     bitcoin.qrc
     bitcoin_locale.qrc
