@@ -26,34 +26,46 @@ Dialog {
     background: Rectangle {
         id: background
         anchors.fill: parent
-        color: MMPTheme.backgroundColor
+        color: MMPTheme.headerColor
         radius: 4
+        border {
+            color: MMPTheme.borderColor
+            width: 1
+        }
     }
 
     header: Label {
         text: unlockDialog.title
         font.bold: true
         padding: 15
-        width: parent.width
         height: 40
         color: MMPTheme.textColor
         background: Rectangle {
-            color: MMPTheme.headerColor
+            color: MMPTheme.ternaryBodyColor
             anchors.fill: parent
             radius: 4
+            anchors.margins: 1
+        }
+        Rectangle {
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+            height: 1
+            color: MMPTheme.borderColor
         }
     }
 
-    contentItem: Rectangle {
+    contentItem: Item {
         anchors.margins: 10
-        color: MMPTheme.bodyColor
-        radius: 4
         anchors {
             top: unlockDialog.header.bottom
             bottom: unlockDialog.footer.top
             left: parent.left
             right: parent.right
-            margins: 10
+            leftMargin: 1
+            rightMargin: 1
         }
         Text {
             id: passphraseLabel
@@ -81,7 +93,6 @@ Dialog {
     }
 
     footer: DialogButtonBox {
-        width: parent.width
         onAccepted: unlockDialog.accept()
         onRejected: unlockDialog.reject()
         Button {
@@ -97,6 +108,7 @@ Dialog {
             anchors.fill: parent
             color: MMPTheme.ternaryBodyColor
             radius: 4
+            anchors.margins: 1
         }
     }
 }
