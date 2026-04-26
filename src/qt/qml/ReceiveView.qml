@@ -17,6 +17,17 @@ Rectangle {
         }
     }
 
+    EditAddressDialog {
+        id: editAddressDialog
+        onAccepted: {
+            if (dialogMode === "AddExistingReceivingAddress") {
+                _walletModel.addressTableModel.addRow("RE", label, address)
+            } else if (dialogMode === "NewReceivingAddress") {
+                _walletModel.addressTableModel.addRow("R", label, address)
+            }
+        }
+    }
+
     Rectangle {
         id: header
         color: MMPTheme.headerColor
@@ -251,15 +262,40 @@ Rectangle {
                     Button {
                         id: addAddressButton
                         Layout.fillHeight: true
-                        implicitWidth: 30
+                        text: qsTr("Add New")
                         icon.source: MMPTheme.themeSelect("qrc:/icons/generic/ic_add_light.svg","qrc:/icons/generic/ic_add_dark.svg")
                         background: Item{}
-                        onClicked: _walletModel.addressTableModel.addRow("R", "", "")
+                        onClicked: {
+                            editAddressDialog.dialogMode = "NewReceivingAddress"
+                            editAddressDialog.label = ""
+                            editAddressDialog.address = ""
+                            editAddressDialog.open()
+                        }
                     }
                     Rectangle {
                         id: buttonSeparator
                         color: addressListRect.border.color
                         Layout.fillHeight: true
+                        width: 1
+                    }
+                    Button {
+                        id: addExistingButton
+                        Layout.fillHeight: true
+                        text: qsTr("Add Existing")
+                        icon.source: MMPTheme.themeSelect("qrc:/icons/generic/ic_add_light.svg","qrc:/icons/generic/ic_add_dark.svg")
+                        background: Item{}
+                        onClicked: {
+                            editAddressDialog.dialogMode = "AddExistingReceivingAddress"
+                            editAddressDialog.label = ""
+                            editAddressDialog.address = ""
+                            editAddressDialog.open()
+                        }
+                    }
+                    Rectangle {
+                        id: buttonSeparator2
+                        color: addressListRect.border.color
+                        Layout.fillHeight: true
+                        visible: addExistingButton.visible
                         width: 1
                     }
                 }
@@ -300,7 +336,7 @@ Rectangle {
                 onPressed: {
                     var component = Qt.createComponent("QRCodeWindow.qml")
                     var windowObj = component.createObject(window)
-                    windowObj.address = addressListView.model.get(addressListView.currentIndex).address
+                    // windowObj.address = addressListView.model.get(addressListView.currentIndex).address
                     windowObj.show()
                 }
             }

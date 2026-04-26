@@ -4,7 +4,7 @@ import MMPTheme 1.0
 
 Dialog {
     id: unlockDialog
-    title: "Unlock Wallet"
+    title: qsTr("Unlock Wallet")
     modal: true
     width: 300
     height: 140

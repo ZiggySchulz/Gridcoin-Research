@@ -65,7 +65,7 @@ public:
 
     /* Return list of owned addresses not yet in the address book.
      */
-    QStringList unbookedReceiveAddresses() const;
+    Q_INVOKABLE QStringList unbookedReceiveAddresses() const;
 
     /* Look up label for address in address book, if not found return empty string.
      */

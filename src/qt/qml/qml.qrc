@@ -35,5 +35,6 @@
         <file>TableHeader.qml</file>
         <file>TabMenu.qml</file>
         <file>UnlockDialog.qml</file>
+        <file>EditAddressDialog.qml</file>
     </qresource>
 </RCC>
