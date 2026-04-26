@@ -24,6 +24,8 @@ Rectangle {
                 _walletModel.addressTableModel.addRow("RE", label, address)
             } else if (dialogMode === "NewReceivingAddress") {
                 _walletModel.addressTableModel.addRow("R", label, address)
+            } else if (dialogMode === "EditReceivingAddress") {
+                _walletModel.addressTableModel.updateEntry(address, label, true, 2)
             }
         }
     }
@@ -136,8 +138,8 @@ Rectangle {
         }
         Rectangle {
             id: addressListRect
+            property int addressColumnWidth: Math.max(300, width*0.5)
             property int labelColumnWidth: width-addressColumnWidth
-            property int addressColumnWidth: Math.max(300, width*0.45)
             color: MMPTheme.themeSelect(MMPTheme.cWhite, "#17222c")
             border.color: MMPTheme.lightBorderColor
             radius: 4
@@ -191,6 +193,13 @@ Rectangle {
                     width: ListView.view.width
                     height: 25
                     onClicked: addressListView.currentIndex=index
+                    function launchEditDialog() {
+                        editAddressDialog.dialogMode = "EditReceivingAddress"
+                        editAddressDialog.label = model.label
+                        editAddressDialog.address = model.address
+                        editAddressDialog.open()
+                    }
+                    onDoubleClicked: launchEditDialog()
                     Rectangle {
                         anchors.fill: parent
                         color: addressListView.currentIndex===index ? MMPTheme.themeSelect(MMPTheme.cFrostWhite, "#212c3b") : "transparent"
@@ -232,8 +241,7 @@ Rectangle {
                             anchors {
                                 top: parent.top
                                 bottom: parent.bottom
-                                right: parent.right
-                                rightMargin: 2
+                                right: editButton.left
                             }
                             background: Item {}
                             onClicked: {
@@ -247,6 +255,19 @@ Rectangle {
                                 readOnly: true
                                 visible: false
                             }
+                        }
+                        Button {
+                            id: editButton
+                            visible: addressListView.currentIndex===index
+                            icon.source: MMPTheme.themeSelect("qrc:/icons/buttons/ic_btn_sign_light.svg","qrc:/icons/buttons/ic_btn_sign_dark.svg")
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                right: parent.right
+                                rightMargin: 2
+                            }
+                            background: Item {}
+                            onClicked: launchEditDialog()
                         }
                     }
                 }
