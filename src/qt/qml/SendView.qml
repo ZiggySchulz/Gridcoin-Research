@@ -291,6 +291,7 @@ Rectangle {
             Layout.preferredHeight: 50
             Layout.margins: 10
             radius: 4
+            border.color: MMPTheme.borderColor
             
             RowLayout {
                 anchors.fill: parent
