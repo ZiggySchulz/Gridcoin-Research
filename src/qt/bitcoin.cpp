@@ -31,18 +31,25 @@
 #include "upgradeqt.h"
 #include "validation.h"
 #include "decoration.h"
+#include "initializationmodel.h"
+#include "sendcoinscontroller.h"
+#include "nativedialoghelper.h"
 
 #include <stdexcept>
 
 #include <QMessageBox>
 #include <QGridLayout>
 #include <QDebug>
-#include <QTextCodec>
 #include <QLocale>
 #include <QTranslator>
 #include <QSplashScreen>
 #include <QLibraryInfo>
 #include <QProcess>
+#include <QDir>
+#include <QQmlApplicationEngine>
+#include <QQuickStyle>
+#include <QQmlContext>
+#include <QFontDatabase>
 
 // This eliminates the linter false positive on double include of QtPlugin
 #if (defined(BITCOIN_NEED_QT_PLUGINS) && !defined(_BITCOIN_QT_PLUGINS_INCLUDED)) || defined(QT_STATICPLUGIN)
@@ -76,7 +83,7 @@ extern bool bGridcoinCoreInitComplete;
 
 // Need a global reference for the notifications to find the GUI
 static BitcoinGUI *guiref;
-static QSplashScreen *splashref;
+static InitializationModel *initRef;
 
 static void RegisterMetaTypes()
 {
@@ -131,34 +138,6 @@ static void ThreadSafeMessageBox(const std::string& message, const std::string& 
     }
 }
 
-static bool ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCaption)
-{
-    if(!guiref)
-        return false;
-
-    int64_t nMinFee;
-
-    {
-        LOCK(cs_main);
-
-        CTransaction txDummy;
-
-        // Min Fee
-        nMinFee = GetBaseFee(txDummy, GMF_SEND);
-    }
-
-    if (nFeeRequired < nMinFee || nFeeRequired <= nTransactionFee)
-        return true;
-    bool payFee = false;
-
-    QMetaObject::invokeMethod(guiref, "askFee", GUIUtil::blockingGUIThreadConnection(),
-                               Q_ARG(qint64, nFeeRequired),
-                               Q_ARG(bool*, &payFee));
-
-    return payFee;
-}
-
-
 static bool ThreadSafeAskQuestion(std::string strCaption, std::string Body)
 {
     if(!guiref) return false;
@@ -183,12 +162,17 @@ static void ThreadSafeHandleURI(const std::string& strURI)
 
 static void InitMessage(const std::string &message)
 {
-    if(splashref)
+    if(initRef)
     {
-        QMetaObject::invokeMethod(splashref, "showMessage",
-                                  Qt::QueuedConnection,
-                                  Q_ARG(QString, QString::fromStdString(message)),
-                                  Q_ARG(int, Qt::AlignBottom|Qt::AlignHCenter));
+        initRef->setMessage(QString::fromStdString(message));
+    }
+}
+
+static void InitProgress(unsigned int loaded, unsigned int total)
+{
+    if(initRef) 
+    {
+        initRef->setLoadandTotal(loaded, total);
     }
 }
 
@@ -243,6 +227,18 @@ static void handleRunawayException(std::exception *e)
     PrintExceptionContinue(e, "Runaway exception");
     QMessageBox::critical(nullptr, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. Gridcoin can no longer continue safely and will quit.") + QString("\n") + QString::fromStdString(strMiscWarning));
     exit(1);
+}
+
+static void loadFonts() {
+    QDir dir{":/fonts/"};
+    for (auto file : dir.entryList(QDir::Files))
+    {
+        int id = QFontDatabase::addApplicationFont(dir.absoluteFilePath(file));
+        if (id == -1) {
+            qWarning() << "Failed to load font:" << file;
+            continue;
+        }
+    }
 }
 
 #ifndef BITCOIN_QT_TEST
@@ -303,6 +299,8 @@ int main(int argc, char *argv[])
     // Initiate the app here to support choosing the data directory.
     Q_INIT_RESOURCE(bitcoin);
     Q_INIT_RESOURCE(bitcoin_locale);
+    Q_INIT_RESOURCE(qml);
+    Q_INIT_RESOURCE(res);
 
     RegisterMetaTypes();
     QApplication app(argc, argv);
@@ -620,25 +618,53 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
     // Install qDebug() message handler to route to debug.log
     qInstallMessageHandler(DebugMessageHandler);
+    
+    InitializationModel initModel;
+    initRef = &initModel;
+    // If -min option passed, start window minimized.
+    initModel.setStartMinimized(gArgs.GetBoolArg("-min"));
 
     // Subscribe to global signals from core
     uiInterface.ThreadSafeMessageBox_connect(ThreadSafeMessageBox);
-    uiInterface.ThreadSafeAskFee_connect(ThreadSafeAskFee);
     uiInterface.ThreadSafeAskQuestion_connect(ThreadSafeAskQuestion);
 
     uiInterface.ThreadSafeHandleURI_connect(ThreadSafeHandleURI);
     uiInterface.InitMessage_connect(InitMessage);
+    uiInterface.InitProgress_connect(InitProgress);
     uiInterface.QueueShutdown_connect(QueueShutdown);
     uiInterface.Translate_connect(Translate);
 
     uiInterface.UpdateMessageBox_connect(UpdateMessageBox);
 
-    QSplashScreen splash(QPixmap(":/images/splash"));
+    loadFonts();
+    QFont font = QFont("SF Pro Text");
+    font.setPixelSize(12);
+    app.setFont(font);
+
+    auto engine = std::make_unique<QQmlApplicationEngine>();    // Heap allocated so we can destroy early
+
+    const QUrl url(QStringLiteral("qrc:/qml/WindowManager.qml"));
+    QObject::connect(engine.get(), &QQmlApplicationEngine::objectCreated,
+                    &app, [url](QObject *obj, const QUrl &objUrl){
+        if (!obj && url == objUrl)
+            QCoreApplication::exit(-1);
+    }, Qt::QueuedConnection);
+
+    QObject::connect(engine.get(), &QQmlEngine::warnings, [](const QList<QQmlError> &warnings) {
+        qWarning() << "QML Warnings:";
+        for (const QQmlError &error : warnings) {
+            // Outputs to log
+            qWarning() << error.toString();
+        }
+    });
+
+    engine->rootContext()->setContextProperty("_initModel", &initModel);
+    
+    engine->load(url);
+
     if (gArgs.GetBoolArg("-splash", true) && !gArgs.GetBoolArg("-min"))
     {
-        splash.setEnabled(false);
-        splash.show();
-        splashref = &splash;
+        initModel.showSplashScreen();
     }
 
     app.processEvents();
@@ -647,8 +673,8 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
     try
     {
-        BitcoinGUI window;
-        guiref = &window;
+        // BitcoinGUI window;
+        // guiref = &window;
 
         LogPrintf("Starting Gridcoin");
 
@@ -670,8 +696,7 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 UninterruptibleSleep(std::chrono::milliseconds{100});
             }
 
-            if (splashref)
-                splash.finish(&window);
+            initModel.hideSplashScreen();
 
             if (!fRequestShutdown) {
                 // Put this in a block, so that the Model objects are cleaned up before
@@ -682,22 +707,18 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
                 ResearcherModel researcherModel;
                 MRCModel mrcModel(&walletModel, &clientModel, &researcherModel);
                 VotingModel votingModel(clientModel, optionsModel, walletModel);
+                SendCoinsController sendCoinsController(walletModel);
+                NativeDialogHelper nativeDialogHelper;
 
-                window.setResearcherModel(&researcherModel);
-                window.setClientModel(&clientModel);
-                window.setWalletModel(&walletModel);
-                window.setMRCModel(&mrcModel);
-                window.setVotingModel(&votingModel);
+                engine->rootContext()->setContextProperty("_clientModel", &clientModel);
+                engine->rootContext()->setContextProperty("_walletModel", &walletModel);
+                engine->rootContext()->setContextProperty("_researcherModel", &researcherModel);
+                engine->rootContext()->setContextProperty("_mrcModel", &mrcModel);
+                engine->rootContext()->setContextProperty("_votingModel", &votingModel);
+                engine->rootContext()->setContextProperty("_sendCoinsController", &sendCoinsController);
+                engine->rootContext()->setContextProperty("_nativeDialog", &nativeDialogHelper);
 
-                // If -min option passed, start window minimized.
-                if(gArgs.GetBoolArg("-min"))
-                {
-                    window.showMinimized();
-                }
-                else
-                {
-                    window.show();
-                }
+                initModel.setDoneLoading(true);
 
                 // Place this here as guiref has to be defined if we don't want to lose URIs
                 ipcInit(argc, argv);
@@ -713,10 +734,8 @@ int StartGridcoinQt(int argc, char *argv[], QApplication& app, OptionsModel& opt
 
                 app.exec();
 
-                window.hide();
-                window.setClientModel(nullptr);
-                window.setWalletModel(nullptr);
-                window.setResearcherModel(nullptr);
+                // Cleanup
+                engine.reset();
                 guiref = nullptr;
             }
             // Shutdown the core and its threads, but don't exit Bitcoin-Qt here
