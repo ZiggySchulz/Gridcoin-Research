@@ -2,6 +2,8 @@
 #define BITCOIN_QT_WALLETMODEL_H
 
 #include <QObject>
+#include <QFuture>
+#include <QPromise>
 #include <vector>
 #include <map>
 
@@ -10,6 +12,7 @@
 
 class OptionsModel;
 class AddressTableModel;
+class AddressFilterProxyModel;
 class TransactionTableModel;
 class CWallet;
 class CKeyID;
@@ -37,6 +40,16 @@ public:
 class WalletModel : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(double balance READ getBalance NOTIFY balanceChanged)
+    Q_PROPERTY(double stake READ getStake NOTIFY balanceChanged)
+    Q_PROPERTY(double unconfirmedBalance READ getUnconfirmedBalance NOTIFY balanceChanged)
+    Q_PROPERTY(double immatureBalance READ getImmatureBalance NOTIFY balanceChanged)
+    Q_PROPERTY(int numTransactions READ getNumTransactions NOTIFY numTransactionsChanged)
+    Q_PROPERTY(EncryptionStatus encryptionStatus READ getEncryptionStatus NOTIFY encryptionStatusChanged);
+
+    Q_PROPERTY(TransactionTableModel* transactionTableModel READ getTransactionTableModel CONSTANT)
+    Q_PROPERTY(AddressTableModel* addressTableModel READ getAddressTableModel CONSTANT)
+    Q_PROPERTY(AddressFilterProxyModel* receiveAddressTableModel READ getReceiveAddressTableModel CONSTANT)
 
 public:
     explicit WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent = nullptr);
@@ -61,16 +74,18 @@ public:
         Unencrypted,  // !wallet->IsCrypted()
         Locked,       // wallet->IsCrypted() && wallet->IsLocked()
         Unlocked      // wallet->IsCrypted() && !wallet->IsLocked()
-    };
+    }; 
+    Q_ENUM(EncryptionStatus)
 
     OptionsModel *getOptionsModel();
     AddressTableModel *getAddressTableModel();
+    AddressFilterProxyModel *getReceiveAddressTableModel();
     TransactionTableModel *getTransactionTableModel();
 
-    qint64 getBalance() const;
-    qint64 getStake() const;
-    qint64 getUnconfirmedBalance() const;
-    qint64 getImmatureBalance() const;
+    double getBalance() const;
+    double getStake() const;
+    double getUnconfirmedBalance() const;
+    double getImmatureBalance() const;
     int getNumTransactions() const;
     EncryptionStatus getEncryptionStatus() const;
 
@@ -90,7 +105,7 @@ public:
     };
 
     // Send coins to a list of recipients
-    SendCoinsReturn sendCoins(const QList<SendCoinsRecipient>& recipients, const CCoinControl* coinControl = nullptr);
+    QFuture<SendCoinsReturn> sendCoins(const QList<SendCoinsRecipient>& recipients, const CCoinControl* coinControl = nullptr);
 
     // Wallet encryption
     bool setWalletEncrypted(const SecureString& passphrase);
@@ -121,7 +136,8 @@ public:
         void CopyFrom(const UnlockContext& rhs);
     };
 
-    UnlockContext requestUnlock();
+    QFuture<UnlockContext> requestUnlock();
+    QFuture<bool> askFee(int64_t nFeeRequired);
 
     bool getPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const;
     bool getKeyFromPool(CPubKey& out_public_key, const std::string& label);
@@ -140,6 +156,7 @@ private:
     OptionsModel *optionsModel;
 
     AddressTableModel *addressTableModel;
+    AddressFilterProxyModel *receiveAddressTableModel;
     TransactionTableModel *transactionTableModel;
 
     // Cache some values to be able to detect changes
@@ -155,6 +172,9 @@ private:
 
     QTimer *pollTimer;
 
+    QPromise<UnlockContext> m_unlockPromise;
+    QPromise<bool> m_askFeePromise;
+
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
     void checkBalanceChanged();
@@ -169,6 +189,10 @@ public slots:
     void updateAddressBook(const QString &address, const QString &label, bool isMine, int status);
     /* Current, immature or unconfirmed balance might have changed - emit 'balanceChanged' if so */
     void pollBalanceChanged();
+
+    void unlockWallet(const QString &password);
+    void cancelUnlock();
+    void askFeeResult(bool result);
 
 signals:
     // Transaction updated. This is necessary because on a resync from zero with an existing wallet.
@@ -192,6 +216,8 @@ signals:
 
     // Asynchronous error notification
     void error(const QString &title, const QString &message, bool modal);
+
+    void askFeeDialog(int64_t feeRequired);
 };
 
 #endif // BITCOIN_QT_WALLETMODEL_H

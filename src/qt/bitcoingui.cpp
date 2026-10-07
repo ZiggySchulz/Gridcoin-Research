@@ -53,7 +53,6 @@
 #endif
 
 #include <QApplication>
-#include <QGuiApplication>
 #include <QFontDatabase>
 #include <QMainWindow>
 #include <QMenuBar>
@@ -125,8 +124,7 @@ BitcoinGUI::BitcoinGUI(QWidget* parent)
 
     if (!restoreGeometry(settings.value(window_geometry_key).toByteArray())) {
         // Restore failed (perhaps missing setting), center the window
-        setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter,QGuiApplication::primaryScreen()->availableGeometry().size()
-                                        * 0.4,QGuiApplication::primaryScreen()->availableGeometry()));
+        move(screen()->geometry().center() - frameGeometry().center());
     }
 
     QFontDatabase::addApplicationFont(":/fonts/inter-bold");

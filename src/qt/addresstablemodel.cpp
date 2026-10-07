@@ -208,6 +208,10 @@ QVariant AddressTableModel::data(const QModelIndex &index, int role) const
             return Receive;
         } // no default case, so the compiler can warn about missing cases
         assert(false);
+    } else if (role == AddressTableModel::LabelRole) {
+        return rec->label;
+    } else if (role == AddressTableModel::AddressRole) {
+        return rec->address;
     }
     return QVariant();
 }
@@ -226,10 +230,15 @@ bool AddressTableModel::setData(const QModelIndex &index, const QVariant &value,
         return wallet->mapAddressBook.count(DecodeDestination(value.toString().toStdString()));
     };
 
-    if (role == Qt::EditRole)
-    {
-        switch(index.column())
-        {
+    if (role == Qt::EditRole || role == AddressTableModel::LabelRole || role == AddressTableModel::AddressRole) {
+        ColumnIndex col = static_cast<ColumnIndex>(index.column());
+        if (role == AddressTableModel::LabelRole) {
+            col = Label;
+        } else if (role == AddressTableModel::AddressRole) {
+            col = Address;
+        }
+
+        switch (col) {
         case Label:
             // Do nothing, if old label == new label
             if(rec->label == value.toString())
@@ -326,7 +335,7 @@ void AddressTableModel::updateEntry(const QString &address, const QString &label
     priv->updateEntry(address, label, isMine, status);
 }
 
-QString AddressTableModel::addRow(const QString &type, const QString &label, const QString &address)
+void AddressTableModel::addRow(const QString &type, const QString &label, const QString &address)
 {
     std::string strLabel = label.toStdString();
     std::string strAddress = address.toStdString();
@@ -337,60 +346,61 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
     {
         if(!walletModel->validateAddress(address))
         {
-            editStatus = INVALID_ADDRESS;
-            return QString();
+            emit editAddressFailed(tr("The entered address \"%1\" is not a valid address.").arg(address));
         }
         // Check for duplicate addresses
         {
             LOCK(wallet->cs_wallet);
             if(wallet->mapAddressBook.count(DecodeDestination(strAddress)))
             {
-                editStatus = DUPLICATE_ADDRESS;
-                return QString();
+                emit editAddressFailed(tr("The entered address \"%1\" is already in the address book.").arg(address));
+                return;
             }
         }
     }
     else if(type == Receive)
     {
         // Generate a new address to associate with given label
-        WalletModel::UnlockContext ctx(walletModel->requestUnlock());
-        if(!ctx.isValid())
-        {
-            // Unlock wallet failed or was cancelled
-            editStatus = WALLET_UNLOCK_FAILURE;
-            return QString();
-        }
-        CPubKey newKey;
-        if(!wallet->GetKeyFromPool(newKey, true))
-        {
-            editStatus = KEY_GENERATION_FAILURE;
-            return QString();
-        }
-        strAddress = EncodeDestination(newKey.GetID());
+        walletModel->requestUnlock().then([this, strLabel](WalletModel::UnlockContext ctx) {
+            if(!ctx.isValid())
+            {
+                // Unlock wallet failed or was cancelled
+                emit editAddressFailed(tr("Wallet unlock was cancelled."));
+                return;
+            }
+            CPubKey newKey;
+            if(!wallet->GetKeyFromPool(newKey, true))
+            {
+                emit editAddressFailed(tr("New key generation failed."));
+                return;
+            }
+            std::string strNewAddress = EncodeDestination(newKey.GetID());
+            {
+                LOCK(wallet->cs_wallet);
+                wallet->SetAddressBookName(DecodeDestination(strNewAddress), strLabel);
+            }
+        });
+        return;
     }
     else if(type == ReceiveExisting)
     {
         if(!walletModel->validateAddress(address))
         {
-            editStatus = INVALID_ADDRESS;
-            return QString();
+            emit editAddressFailed(tr("The entered address \"%1\" is not a valid address.").arg(address));
+            return;
         }
         LOCK(wallet->cs_wallet);
         CTxDestination dest = DecodeDestination(strAddress);
         if(IsMine(*wallet, dest) == ISMINE_NO)
         {
-            editStatus = NOT_MINE;
-            return QString();
+            emit editAddressFailed(tr("The entered address \"%1\" is not owned by this wallet.").arg(address));
+            return;
         }
         if(wallet->mapAddressBook.count(dest))
         {
-            editStatus = DUPLICATE_ADDRESS;
-            return QString();
+            emit editAddressFailed(tr("The entered address \"%1\" is already in the address book.").arg(address));
+            return;
         }
-    }
-    else
-    {
-        return QString();
     }
 
     // Add entry
@@ -398,7 +408,6 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
         LOCK(wallet->cs_wallet);
         wallet->SetAddressBookName(DecodeDestination(strAddress), strLabel);
     }
-    return QString::fromStdString(strAddress);
 }
 
 bool AddressTableModel::removeRows(int row, int count, const QModelIndex &parent)
@@ -467,4 +476,63 @@ int AddressTableModel::lookupAddress(const QString &address) const
 void AddressTableModel::emitDataChanged(int idx)
 {
     emit dataChanged(index(idx, 0, QModelIndex()), index(idx, columns.length()-1, QModelIndex()));
+}
+
+QHash<int, QByteArray> AddressTableModel::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles[TypeRole] = "type";
+    roles[AddressTableModel::LabelRole] = "label";
+    roles[AddressTableModel::AddressRole] = "address";
+    return roles;
+}
+
+AddressFilterProxyModel::AddressFilterProxyModel(QObject* parent) : QSortFilterProxyModel(parent)
+{
+    setDynamicSortFilter(true);
+    setFilterCaseSensitivity(Qt::CaseInsensitive);
+}
+
+void AddressFilterProxyModel::setFilterString(const QString& filter)
+{
+    if (m_filterString != filter) {
+        m_filterString = filter;
+        emit filterStringChanged();
+        invalidateFilter(); // Deprecated. Replacement introduced 6.9
+    }
+}
+
+void AddressFilterProxyModel::setTypeFilter(const QString& filter)
+{
+    if (m_typeFilter != filter) {
+        m_typeFilter = filter;
+        emit typeFilterChanged();
+        invalidateFilter(); // Deprecated. Replacement introduced 6.9
+    }
+}
+
+bool AddressFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
+{
+    QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
+
+    // Filter by type
+    if (!m_typeFilter.isEmpty()) {
+        QString type = sourceModel()->data(index, AddressTableModel::TypeRole).toString();
+        if (type != m_typeFilter) {
+            return false;
+        }
+    }
+
+    // Filter by string (label or address)
+    if (!m_filterString.isEmpty()) {
+        QString label = sourceModel()->data(index, AddressTableModel::LabelRole).toString();
+        QString address = sourceModel()->data(index, AddressTableModel::AddressRole).toString();
+
+        if (!label.contains(m_filterString, Qt::CaseInsensitive) &&
+            !address.contains(m_filterString, Qt::CaseInsensitive)) {
+            return false;
+        }
+    }
+
+    return true;
 }

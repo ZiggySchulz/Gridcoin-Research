@@ -23,6 +23,30 @@ QT_END_NAMESPACE
 class ClientModel : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(int numBlocks READ getNumBlocks NOTIFY numBlocksChanged)
+    Q_PROPERTY(int numBlocksPeers READ getNumBlocksOfPeers NOTIFY numBlocksChanged)
+    Q_PROPERTY(double difficulty READ getDifficulty NOTIFY difficultyChanged)
+    Q_PROPERTY(double networkWeight READ getNetWeight NOTIFY numBlocksChanged)
+    Q_PROPERTY(double coinWeight READ getCoinWeight NOTIFY minerStatusChanged)
+
+    Q_PROPERTY(bool inSync READ inSync NOTIFY numBlocksChanged)
+    
+    // Q_PROPERTY(QDateTime bestBlockTime READ getLastBlockDate NOTIFY numBlocksChanged)
+    // Q_PROPERTY(int numConnections READ getNumConnections NOTIFY numConnectionsChanged)
+    // Q_PROPERTY(quint64 totalBytesRecv READ getTotalBytesRecv NOTIFY bytesChanged)
+    // Q_PROPERTY(quint64 totalBytesSent READ getTotalBytesSent NOTIFY bytesChanged)
+
+    Q_PROPERTY(bool isTestNet READ isTestNet CONSTANT)
+    // Q_PROPERTY(bool inInitialBlockDownload READ inInitialBlockDownload CONSTANT)
+
+    Q_PROPERTY(QString statusBarWarnings READ getStatusBarWarnings NOTIFY numBlocksChanged)
+    Q_PROPERTY(QString minerWarnings READ getMinerWarnings NOTIFY minerStatusChanged)
+
+    Q_PROPERTY(QString fullVersion READ formatFullVersion CONSTANT)
+    // Q_PROPERTY(QString clientName READ clientName CONSTANT)
+    // Q_PROPERTY(QString startupTime READ formatClientStartupTime CONSTANT)
+    // Q_PROPERTY(QString boostVersion READ formatBoostVersion CONSTANT)
+
 public:
     explicit ClientModel(OptionsModel* optionsModel, QObject* parent = nullptr);
     ~ClientModel();
@@ -53,6 +77,8 @@ public:
     QString getStatusBarWarnings() const;
     //! Get miner and staking status warnings
     QString getMinerWarnings() const;
+    //! Is client in sync
+    bool inSync() const;
 
     QString formatFullVersion() const;
     QString clientName() const;
@@ -76,6 +102,7 @@ private:
 
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
+    double getCoinWeight() const;
 signals:
     void numConnectionsChanged(int count);
     void numBlocksChanged(int count, int countOfPeers);

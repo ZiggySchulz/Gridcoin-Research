@@ -10,7 +10,6 @@
 #include "gridcoin/magnitude.h"
 #include "gridcoin/project.h"
 #include "gridcoin/quorum.h"
-#include "gridcoin/researcher.h"
 #include "gridcoin/scraper/scraper.h"
 #include "gridcoin/superblock.h"
 #include "gridcoin/support/xml.h"
@@ -417,6 +416,12 @@ QString ResearcherModel::formatAccrual(const int display_unit, bool& near_limit)
     return text;
 }
 
+QString ResearcherModel::formatAccrual() const
+{
+    bool near_limit = false;
+    return formatAccrual(BitcoinUnit::BTC, near_limit);
+}
+
 QString ResearcherModel::formatStatus() const
 {
     if (outOfSync()) {
@@ -490,6 +495,16 @@ QString ResearcherModel::formatBeaconVerificationCode() const
     }
 
     return QString::fromStdString(m_pending_beacon->GetVerificationCode());
+}
+
+GRC::ResearcherMode ResearcherModel::getResearcherMode() const {
+    if (hasEligibleProjects()) {
+        return GRC::ResearcherMode::SOLO;
+    } else if (hasPoolProjects()) {
+        return GRC::ResearcherMode::POOL;
+    } else {
+        return GRC::ResearcherMode::NONCRUNCHER;
+    }
 }
 
 std::vector<ProjectRow> ResearcherModel::buildProjectTable(bool extended) const

@@ -96,6 +96,11 @@ double ClientModel::getNetWeight() const
     return m_cached_net_weight;
 }
 
+double ClientModel::getCoinWeight() const
+{
+    return g_miner_status.GetSearchReport().CoinWeight();
+}
+
 quint64 ClientModel::getTotalBytesRecv() const
 {
     return CNode::GetTotalBytesRecv();
@@ -229,6 +234,10 @@ QString ClientModel::getStatusBarWarnings() const
 QString ClientModel::getMinerWarnings() const
 {
     return QString::fromStdString(g_miner_status.FormatErrors());
+}
+
+bool ClientModel::inSync() const {
+    return !OutOfSyncByAge();
 }
 
 OptionsModel *ClientModel::getOptionsModel()

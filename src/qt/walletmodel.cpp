@@ -3,12 +3,14 @@
 #include "optionsmodel.h"
 #include "addresstablemodel.h"
 #include "transactiontablemodel.h"
+#include "bitcoinunits.h"
 
 #include "node/ui_interface.h"
 #include "wallet/wallet.h"
 #include <key_io.h>
 #include "util.h"
 #include "gridcoin/tx_message.h"
+#include "policy/fees.h"
 
 #include <QSet>
 #include <QTimer>
@@ -30,6 +32,10 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
          , cachedNumBlocks(0)
 {
     addressTableModel = new AddressTableModel(wallet, this);
+    receiveAddressTableModel = new AddressFilterProxyModel(this);
+    receiveAddressTableModel->setSourceModel(addressTableModel);
+    receiveAddressTableModel->setTypeFilter(AddressTableModel::Receive);
+
     transactionTableModel = new TransactionTableModel(wallet, this);
 
     // This timer will be fired repeatedly to update the balance
@@ -45,24 +51,24 @@ WalletModel::~WalletModel()
     unsubscribeFromCoreSignals();
 }
 
-qint64 WalletModel::getBalance() const
+double WalletModel::getBalance() const
 {
-    return wallet->GetBalance();
+    return BitcoinUnits::halfordsToGrc(wallet->GetBalance());
 }
 
-qint64 WalletModel::getUnconfirmedBalance() const
+double WalletModel::getUnconfirmedBalance() const
 {
-    return wallet->GetUnconfirmedBalance();
+    return BitcoinUnits::halfordsToGrc(wallet->GetUnconfirmedBalance());
 }
 
-qint64 WalletModel::getStake() const
+double WalletModel::getStake() const
 {
-    return wallet->GetStake();
+    return BitcoinUnits::halfordsToGrc(wallet->GetStake());
 }
 
-qint64 WalletModel::getImmatureBalance() const
+double WalletModel::getImmatureBalance() const
 {
-    return wallet->GetImmatureBalance();
+    return BitcoinUnits::halfordsToGrc(wallet->GetImmatureBalance());
 }
 
 int WalletModel::getNumTransactions() const
@@ -104,6 +110,27 @@ void WalletModel::pollBalanceChanged()
         if(transactionTableModel)
             transactionTableModel->updateConfirmations();
     }
+}
+
+void WalletModel::unlockWallet(const QString &qPassword) {
+    bool was_locked = getEncryptionStatus() == WalletModel::Locked;
+    SecureString passphrase;
+    passphrase.reserve(qPassword.size());
+    passphrase.assign(qPassword.toStdString());
+    setWalletLocked(false, passphrase);
+    bool valid = getEncryptionStatus() != WalletModel::Locked;
+    m_unlockPromise.addResult(WalletModel::UnlockContext(this, valid, was_locked && !fWalletUnlockStakingOnly));
+    m_unlockPromise.finish();
+}
+
+void WalletModel::cancelUnlock() {
+    m_unlockPromise.addResult(WalletModel::UnlockContext(this, false, false));
+    m_unlockPromise.finish();
+}
+
+void WalletModel::askFeeResult(bool result) {
+    m_askFeePromise.addResult(result);
+    m_askFeePromise.finish();
 }
 
 void WalletModel::checkBalanceChanged()
@@ -178,35 +205,44 @@ bool WalletModel::validateAddress(const QString &address)
     return IsValidDestination(addressParsed);
 }
 
-WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipient> &recipients, const CCoinControl *coinControl)
+QFuture<WalletModel::SendCoinsReturn> WalletModel::sendCoins(const QList<SendCoinsRecipient> &recipients, const CCoinControl *coinControl)
 {
     qint64 total = 0;
     QSet<QString> setAddress;
-    QString hex;
+
+    QPromise<SendCoinsReturn> promise;
 
     if(recipients.empty())
     {
-        return OK;
+        promise.addResult(OK);
+        promise.finish();
+        return promise.future();
     }
 
     // Pre-check input data for validity
     for (const SendCoinsRecipient& rcp : recipients) {
         if(!validateAddress(rcp.address))
         {
-            return InvalidAddress;
+             promise.addResult(InvalidAddress);
+            promise.finish();
+            return promise.future();
         }
         setAddress.insert(rcp.address);
 
         if(rcp.amount <= 0)
         {
-            return InvalidAmount;
+            promise.addResult(InvalidAmount);
+            promise.finish();
+            return promise.future();
         }
         total += rcp.amount;
     }
 
     if(recipients.size() > setAddress.size())
     {
-        return DuplicateAddress;
+        promise.addResult(DuplicateAddress);
+        promise.finish();
+        return promise.future();
     }
 
     int64_t nBalance = 0;
@@ -228,12 +264,16 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
 
     if(total > nBalance)
     {
-        return AmountExceedsBalance;
+        promise.addResult(AmountExceedsBalance);
+        promise.finish();
+        return promise.future();
     }
 
     if(!fAnySubtractFeeFromAmount && (total + nTransactionFee) > nBalance)
     {
-        return SendCoinsReturn(AmountWithFeeExceedsBalance, nTransactionFee);
+        promise.addResult(SendCoinsReturn(AmountWithFeeExceedsBalance, nTransactionFee));
+        promise.finish();
+        return promise.future();
     }
 
     CWalletTx wtx;
@@ -250,6 +290,8 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
             recipients[0].Message.toStdString()));
     }
 
+    int64_t nFeeRequired = 0;
+    CReserveKey keyChange(wallet);
     {
         LOCK2(cs_main, wallet->cs_wallet);
 
@@ -261,8 +303,6 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
             vecSend.push_back(std::make_pair(scriptPubKey, rcp.amount));
         }
 
-        CReserveKey keyChange(wallet);
-        int64_t nFeeRequired = 0;
         bool fCreated = wallet->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, coinControl);
 
         // If any recipient has "subtract fee from amount" enabled, rebuild the
@@ -308,7 +348,9 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
                         }
                         if (nAmount <= 0)
                         {
-                            return SendCoinsReturn(FeeExceedsSubtractedAmount, nFeeRequired);
+                            promise.addResult(SendCoinsReturn(FeeExceedsSubtractedAmount, nFeeRequired));
+                            promise.finish();
+                            return promise.future();
                         }
                     }
 
@@ -330,41 +372,50 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(const QList<SendCoinsRecipie
         {
             if(!fAnySubtractFeeFromAmount && (total + nFeeRequired) > nBalance)
             {
-                return SendCoinsReturn(AmountWithFeeExceedsBalance, nFeeRequired);
+                promise.addResult(SendCoinsReturn(AmountWithFeeExceedsBalance, nFeeRequired));
+                promise.finish();
+                return promise.future();
             }
-            return TransactionCreationFailed;
+            promise.addResult(TransactionCreationFailed);
+            promise.finish();
+            return promise.future();
         }
+    }
 
-        if(!uiInterface.ThreadSafeAskFee(nFeeRequired, tr("Sending...").toStdString()))
+    return askFee(nFeeRequired).then([this, wtx = std::move(wtx), keyChange = std::move(keyChange), recipients = std::move(recipients)](bool accepted) mutable -> SendCoinsReturn {
+        if (!accepted) 
         {
             return Aborted;
         }
-        if(!wallet->CommitTransaction(wtx, keyChange))
         {
-            return TransactionCommitFailed;
-        }
-        hex = QString::fromStdString(wtx.GetHash().GetHex());
-    }
-
-    // Add addresses / update labels that we've sent to the address book
-    for (const SendCoinsRecipient& rcp : recipients) {
-        std::string strAddress = rcp.address.toStdString();
-        CTxDestination dest = DecodeDestination(strAddress);
-        std::string strLabel = rcp.label.toStdString();
-        {
-            LOCK(wallet->cs_wallet);
-
-            std::map<CTxDestination, std::string>::iterator mi = wallet->mapAddressBook.find(dest);
-
-            // Check if we have a new address or an updated label
-            if (mi == wallet->mapAddressBook.end() || mi->second != strLabel)
+            LOCK2(cs_main, wallet->cs_wallet);
+            if (!wallet->CommitTransaction(wtx, keyChange)) 
             {
-                wallet->SetAddressBookName(dest, strLabel);
+                return TransactionCommitFailed;
             }
         }
-    }
+        QString hex = QString::fromStdString(wtx.GetHash().GetHex());
+        // Add addresses / update labels that we've sent to the address book
+        for (const SendCoinsRecipient& rcp : recipients) 
+        {
+            std::string strAddress = rcp.address.toStdString();
+            CTxDestination dest = DecodeDestination(strAddress);
+            std::string strLabel = rcp.label.toStdString();
+            {
+                LOCK(wallet->cs_wallet);
 
-    return SendCoinsReturn(OK, 0, hex);
+                std::map<CTxDestination, std::string>::iterator mi = wallet->mapAddressBook.find(dest);
+
+                // Check if we have a new address or an updated label
+                if (mi == wallet->mapAddressBook.end() || mi->second != strLabel) 
+                {
+                    wallet->SetAddressBookName(dest, strLabel);
+                }
+            }
+        }
+
+        return SendCoinsReturn(OK, 0, hex);
+    });
 }
 
 OptionsModel *WalletModel::getOptionsModel()
@@ -375,6 +426,11 @@ OptionsModel *WalletModel::getOptionsModel()
 AddressTableModel *WalletModel::getAddressTableModel()
 {
     return addressTableModel;
+}
+
+AddressFilterProxyModel *WalletModel::getReceiveAddressTableModel()
+{
+    return receiveAddressTableModel;
 }
 
 TransactionTableModel *WalletModel::getTransactionTableModel()
@@ -482,9 +538,18 @@ void WalletModel::unsubscribeFromCoreSignals()
 }
 
 // WalletModel::UnlockContext implementation
-WalletModel::UnlockContext WalletModel::requestUnlock()
+QFuture<WalletModel::UnlockContext> WalletModel::requestUnlock()
 {
-    bool was_locked = getEncryptionStatus() == Locked;
+    if (m_unlockPromise.future().isRunning()) {
+        // Already waiting for an unlock
+        LogPrintf("INFO: %s: Already waiting for an unlock...", __func__);
+        return m_unlockPromise.future();
+    }
+
+    m_unlockPromise = QPromise<WalletModel::UnlockContext>();
+    m_unlockPromise.start();
+
+    bool was_locked = getEncryptionStatus() == WalletModel::Locked;
 
     if ((!was_locked) && fWalletUnlockStakingOnly)
     {
@@ -495,12 +560,46 @@ WalletModel::UnlockContext WalletModel::requestUnlock()
     if(was_locked)
     {
         // Request UI to unlock wallet
+        LogPrintf("INFO: %s: Requesting wallet unlock from UI...", __func__);
         emit requireUnlock();
+    } else
+    {
+        // Already unlocked, fulfill immediately
+        bool valid = getEncryptionStatus() != WalletModel::Locked;
+        m_unlockPromise.addResult(WalletModel::UnlockContext(this, valid, was_locked && !fWalletUnlockStakingOnly));
+        m_unlockPromise.finish();
     }
-    // If wallet is still locked, unlock was failed or cancelled, mark context as invalid
-    bool valid = getEncryptionStatus() != Locked;
+    return m_unlockPromise.future();
+}
 
-    return UnlockContext(this, valid, was_locked && !fWalletUnlockStakingOnly);
+QFuture<bool> WalletModel::askFee(int64_t nFeeRequired)
+{
+    if (m_askFeePromise.future().isRunning()) {
+        // Already waiting for a fee confirmation
+        LogPrintf("INFO: %s: Already waiting for a fee confirmation...", __func__);
+        return m_askFeePromise.future();
+    }
+
+    m_askFeePromise = QPromise<bool>();
+    m_askFeePromise.start();
+
+    int64_t nMinFee;
+    {
+        LOCK(cs_main);
+        CTransaction txDummy;
+
+        // Min Fee
+        nMinFee = GetBaseFee(txDummy, GMF_SEND);
+    }
+
+    if (nFeeRequired < nMinFee || nFeeRequired <= nTransactionFee) {
+        m_askFeePromise.addResult(true);
+        m_askFeePromise.finish();
+        return m_askFeePromise.future();
+    }
+    
+    emit askFeeDialog(nFeeRequired);
+    return m_askFeePromise.future();
 }
 
 WalletModel::UnlockContext::UnlockContext(WalletModel *wallet, bool valid, bool relock):

@@ -16,10 +16,12 @@
 #include <vector>
 #include <QVariant>
 #include <QStringList>
+#include <QFuture>
 
 namespace GRC {
 class PollRegistry;
 }
+
 
 class ClientModel;
 class OptionsModel;
@@ -113,7 +115,7 @@ private:
 class VotingModel : public QObject
 {
     Q_OBJECT
-
+    Q_PROPERTY(QString currentPollTitle READ getCurrentPollTitle NOTIFY newPollReceived)
 public:
     VotingModel(
         ClientModel& client_model,
@@ -154,7 +156,7 @@ public:
 
     CAmount estimatePollFee() const;
 
-    VotingResult sendPoll(
+    QFuture<VotingResult> sendPoll(
             const GRC::PollType& type,
             const QString& title,
             const int duration_days,
