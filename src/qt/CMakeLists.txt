@@ -1,3 +1,5 @@
+set(QT_QML_GENERATE_QMLLS_INI ON)
+
 # Translations
 # ============
 add_subdirectory(locale)
@@ -113,9 +115,14 @@ add_library(gridcoinqt STATIC
     voting/votingpage.cpp
     walletmodel.cpp
     winshutdownmonitor.cpp
+    initializationmodel.cpp
+    sendcoinscontroller.cpp
+    nativedialoghelper.cpp
 
     bitcoin.qrc
     bitcoin_locale.qrc
+    qml/qml.qrc
+    res/res.qrc
 )
 
 if(WIN32)
@@ -131,6 +138,7 @@ elseif(APPLE)
     )
 endif()
 
+set(CMAKE_AUTOMOC ON)
 set_target_properties(gridcoinqt PROPERTIES
     AUTOMOC ON
     AUTORCC ON
@@ -155,22 +163,57 @@ set_source_files_properties(
         SKIP_AUTOUIC ON
 )
 
+if (COMMAND qt_policy AND QT_KNOWN_POLICY_QTP0004)
+    qt_policy(SET QTP0004 NEW)
+endif()
+
+set_source_files_properties(qml/plugins/MMPTheme/MMPTheme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+qt_add_qml_module(MMPTheme
+    URI MMPTheme
+    VERSION 1.0
+    RESOURCE_PREFIX qt/qml
+    OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/MMPTheme"
+    QML_FILES  
+        qml/plugins/MMPTheme/MMPTheme.qml
+        qml/MMPControls/Button.qml
+        qml/MMPControls/CheckBox.qml
+        qml/MMPControls/ComboBox.qml
+        qml/MMPControls/GroupBox.qml
+        qml/MMPControls/RadioButton.qml
+        qml/MMPControls/ScrollBar.qml
+        qml/MMPControls/ScrollIndicator.qml
+        qml/MMPControls/SpinBox.qml
+        qml/MMPControls/TextArea.qml
+        qml/MMPControls/TextField.qml
+)
+
+set_source_files_properties(qml/plugins/CurrentTime/CurrentTime.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+qt_add_qml_module(CurrentTime
+    URI CurrentTime
+    VERSION 1.0
+    RESOURCE_PREFIX qt/qml
+    OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/CurrentTime"
+    QML_FILES  
+        qml/plugins/CurrentTime/CurrentTime.qml
+)
+
 # Libraries to link
 # =================
 
 target_link_libraries(gridcoinqt PUBLIC
+    MMPTheme
+    CurrentTime
     ${QT}::Core
     ${QT}::Concurrent
     ${QT}::Gui
     ${QT}::Network
     ${QT}::Widgets
     ${QT}::Svg
+    ${QT}::Qml
+    ${QT}::QuickControls2
     gridcoin_util
 )
 
-if(USE_QT6)
-    target_link_libraries(gridcoinqt PUBLIC ${QT}::Core5Compat)
-endif()
 if(USE_DBUS)
     target_link_libraries(gridcoinqt PUBLIC ${QT}::DBus)
 endif()
@@ -186,7 +229,7 @@ elseif(WIN32)
 endif()
 
 target_compile_definitions(gridcoinqt PUBLIC HAVE_CONFIG_H)
-target_compile_definitions(gridcoinqt PUBLIC QT_DISABLE_DEPRECATED_UP_TO=0x050F00)
+target_compile_definitions(gridcoinqt PUBLIC QT_DISABLE_DEPRECATED_UP_TO=0x060200)
 
 if(ENABLE_UPNP)
     if(DEFAULT_UPNP)
@@ -218,7 +261,7 @@ endif()
 add_executable(gridcoinresearch bitcoin.cpp ${GRIDCOIN_RC})
 
 # macOS Bundle Resources
-set(MACOSX_BUNDLE_RESOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/res/icons/gridcoin.icns")
+set(MACOSX_BUNDLE_RESOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/res/icons/logos/gridcoin.icns")
 if(APPLE)
     target_sources(gridcoinresearch PRIVATE ${MACOSX_BUNDLE_RESOURCE_FILES})
 endif()
@@ -279,6 +322,9 @@ endif()
 
 set_target_properties(gridcoinresearch PROPERTIES
     WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE_GUI_IDENTIFIER gridcoin.us
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
     MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/share/qt/Info.plist.cmake.in"
     RESOURCE ${MACOSX_BUNDLE_RESOURCE_FILES}
